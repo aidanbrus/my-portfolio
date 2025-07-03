@@ -6,4 +6,21 @@
         <!-- I think is where to link page to css-->
     </head>
     <h1> Methods and Ways </h1>
+    <h2> Basic Methods for Race Predictions </h2>
+    <p>
+        The most basic idea for these models was to try and predict the outcome of F1 races using information that can be obtained
+        before the race. I didn't want any information from the current race, which limited me to information available up to the
+        end of qualifying. This includes historical information, which I do use in some of the models. 
+        <hr>
+        Each model is built using pytorch in jupyter notebooks. I chose jupyter notebooks because I am familiar with them but 
+        also I wanted to use pytorch for building the models, largely because I am comfortable with python already. Knowing 
+        python allowed me to spend more time learning pytorch and focusing on the performance of the models than on the basics
+        of python. For most of the information I am using the FastF1 repository, which has most of the relevant data I am using
+        for training. There are a few values I either collect or calculated myself, but most values were gathered from FastF1.
+        <hr>
+        Each model featured here is unique in one of the following ways: training data, optimizer, or loss fuction. Currently, I 
+        haven't noticed any significant difference in actual model structure, be it layers or even nodes per layer. More of this
+        information will be featured on the results page, if you are interested in these observations. The hope is to feature a
+        variety of models to see how difference in approach efffect the overall efficacy of the predictions.
+    </p>
 </html>
