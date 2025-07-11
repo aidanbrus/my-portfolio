@@ -1,17 +1,21 @@
 body {
-    background-color: lightblue;
+    background-color: rgb(190, 52, 25);
 }
 
 p {
     font-family: Verdana;
-    font-size: 50px;
-    font-weight: 700;
-
+    font-size: 25px;
+    font-weight: 200;
+    background-color: rgb(194, 194, 194, 0.2);
+    border: 2px hidden;
+    border-radius: 8px;
 }
 
 h1 {
-    font-family: Geneva;
-    font-size: 100px;
-    font-weight: 800;
-
+    font-family: Tahoma;
+    font-size: 50px;
+    font-weight: 300;
+    background-color: aliceblue;
+    border: 2px hidden;
+    border-radius: 8px;
 }
