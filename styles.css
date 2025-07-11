@@ -1,0 +1,17 @@
+body {
+    background-color: lightblue;
+}
+
+p {
+    font-family: Verdana;
+    font-size: 50px;
+    font-weight: 700;
+
+}
+
+h1 {
+    font-family: Geneva;
+    font-size: 100px;
+    font-weight: 800;
+
+}
