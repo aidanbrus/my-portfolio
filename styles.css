@@ -28,7 +28,7 @@ h2 {
 
 }
 
-/* navbar elements*/
+/* navbar elements */
 .navbar {
   display: flex;
   justify-content: center;
@@ -39,18 +39,87 @@ h2 {
 }
 
 .navbar li {
-  margin: 0 15px;
+  margin: 15px;
 }
-
+/*
 .navbar a {
   display: block;
-  padding: 14px 20px;
+  padding: 14px 25px;
   color: white;
   text-decoration: none;
 }
-
+/*
 .navbar a:hover {
   background-color: #555;
 }
 
-/* next unique set of elements*/
+ next unique set of elements*/
+/* SHIFT */
+/*
+.navbar a {
+  position:relative;
+  z-index: 1;
+  padding: 15px 30px;
+  color: white;
+  text-decoration: none;
+}
+.navbar a:hover {
+  color: rgb(129, 18, 18);
+}
+.navbar a:after {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto;
+  width: 100%;
+  height: 1px;
+  content: '.';
+  color: transparent;
+  background: rgb(255,255,255, 0.5);
+  visibility: none;
+  opacity: 0;
+  z-index: -1;
+}
+.navbar a:hover:after {
+  opacity: 1;
+  visibility: visible;
+  height: 100%;
+}
+*/
+
+.navbar a {
+  text-decoration: none;
+  position: relative;
+  z-index: 1;
+  /*transition: rgb(255,255,255) 0.3s;*/
+  padding: 15px 30px;
+  color: rgb(255,255,255);
+}
+
+.navbar a:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 0;
+  background-color: rgb(125,125,125, 0.2);
+  transition: width 0.0s, height 0.3s, left 0.0s, top 0.0s;
+  z-index: -1;
+}
+
+.navbar a:hover {
+  color: #FFFFFF;
+}
+
+.navbar a:hover::after {
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
