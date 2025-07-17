@@ -1,14 +1,15 @@
+/* general page elements*/
 body {
     background-color: rgb(190, 52, 25);
 }
 
 p {
     font-family: Verdana;
-    font-size: 25px;
-    font-weight: 200;
-    background-color: rgb(194, 194, 194, 0.2);
+    font-size: 20px;
+    font-weight: 150;
+    background-color: rgb(194, 194, 194, 0.4);
     border: 2px hidden;
-    border-radius: 8px;
+    border-radius: 4px;
 }
 
 h1 {
@@ -19,3 +20,37 @@ h1 {
     border: 2px hidden;
     border-radius: 8px;
 }
+
+h2 {
+    font-family: Verdana;
+    font-size: 30px;
+    font-weight: 200;
+
+}
+
+/* navbar elements*/
+.navbar {
+  display: flex;
+  justify-content: center;
+  background-color: #333;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar li {
+  margin: 0 15px;
+}
+
+.navbar a {
+  display: block;
+  padding: 14px 20px;
+  color: white;
+  text-decoration: none;
+}
+
+.navbar a:hover {
+  background-color: #555;
+}
+
+/* next unique set of elements*/

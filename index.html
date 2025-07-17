@@ -3,24 +3,35 @@
 <!-- Pages I need to make and link to: about the project, about me, and history of performance and metrics of models-->
 <!-- Need a bar to go from page to page so you can easily go between. might need to make a year selector (?)-->
 <!DOCTYPE html>
-<html>
-    <head>
-        <title> Prediction Home </title>
-        <!-- link style sheet here for this page-->
-        <link rel="stylesheet" href="styles.css">
-    </head>
-    <h1> Race Results Predictions </h1>
-    <body>
-    <hr>
-    <p>
-        These models are meant to predict the outcome of the race only using qualifying information from the current session
-        as well as relevent data that is known or quantified before the race. For more information about how the models are set
-        and training parameters, visit the <a href="about.html">page</a>.
-    </p>
-    </body>
-    <head>
-        <title>Weekly Race Results Predictions</title>
-        <!-- where the tables of info will go-->
-        <div id="table-container"></div>
-    </head>
+<html lang="en">
+<head>
+    <title> Prediction Home </title>
+    <!-- link style sheet here for this page-->
+    <link rel="stylesheet" href="styles.css">
+</head>   
+<body>
+    <header>
+        <h1> Race Results Predictions </h1>
+        <nav>
+            <ul class="navbar">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">Methods</a></li>
+                <li><a hreft="results.html">Analysis</a></li>
+                <li><a href="profile.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <p>
+            These models are meant to predict the outcome of the race only using qualifying information from the current session
+            as well as relevent data that is known or quantified before the race. For more information about how the models are set
+            and training parameters, visit the <a href="about.html">page</a>.
+        </p>
+        <head>
+            <title>Weekly Race Results Predictions</title>
+            <!-- where the tables of info will go-->
+            <div id="table-container"></div>
+        </head>
+    </main>
+</body>
 </html>
