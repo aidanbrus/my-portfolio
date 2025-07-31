@@ -1,0 +1,76 @@
+<!-- This is the about page for the project, not myself-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title> F1 Predictions </title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- I think is where to link page to css-->
+</head>
+<body>
+    <header>
+        <h1>About F1 Predictions </h1>
+        <nav id="navbar">
+            <ul class="navbar">
+                <!-- log on navbar would be cool-->
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">F1 Predictions</a></li>
+                <li><a href="results.html">Analysis</a></li>
+                <li><a href="profile.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <p>
+            Welcome to F1 Predictions, a home for using AI and neural nets to try and predict the outcome of F1 races. Using
+            pytorch in python, these models are constructed and trained to make a specific predictions. For more detailed information 
+            on each model and methods, check out the <a href="results.html">Model and Method Analysis</a> page. 
+            
+        </p>
+        <h2>Race Prediction Models</h2>
+        <p>
+            Each model featured is unique from the other models; however, they all share one goal: predict the outcomes of the
+            race before race day. Using historical and qualifying data, these models try to predict how race day will go. The 
+            idea behind these models was to only use data that is available before race day. The models vary on a variety
+            of input parameters, from how many traing races are used to what data is included for each race. By varying these 
+            parameters, I hoped to test what worked, what didn't, and why. By having each model slightly different that the others
+            I hope to compare the performance of each model not just against the actual results but amongst their peers,
+        </p>
+        <p>
+            Race predictions were my first choice of project as I feel that everyone is always wondering who is going to win 
+            for a given race weekend, especially if qualifying is abnormal or interesting. It sounds counter-intuitive to try and
+            predict the outcome, removing the exciting unknown from race day, however, all it takes is one crash or yellow flag
+            to change everything. Although there is likely a way to have these models give a distribution of predictions given a 
+            variety of outcomes, these current models just return one outcome. 
+        </p>
+        <h2>Short Comings of The Models</h2>
+        <!--limited scope, dealing with dnf, instability above p14-ish-->
+        <p>
+            Although the model do produce reasonable results, there are still shortcomings to these models. The first biggest 
+            issue is scope. For training these models, usually the more data the better; however, it needs to be good data, not
+            just any data. For my first models, the training data only included races from 2022 to 2024, which isn't many race.
+            Thus my first models had very small training sets. Although I could likely implement many more years, F1 evolves 
+            rather quickly as a sport, between inovation from the teams and rule changes by the FIA. Even though there is decades
+            of information I could gather, the data may not be relevant enough to train models on. I did choose 2022 arbitrarily
+            at first, but looking back I don't think it was the worst choice. My training data may be small, but at least all of
+            the data should be highly relevant. 
+        </p>
+        <p>
+            One of the next biggest problems of the models is DNF and gaps in data. I do go over this more indepth in 
+            <a href="results.html">Analysis</a>, but this does impact how the data gathering, processing, and model training.
+            Given I use pytorch for my model, the tensor use integer and float values, so all NA elements must be converted into 
+            some value. One of the more difficult choices I had was deciding how to deal with driver DNF's. I don't know if 
+            there exists a solution with no problems, and my solution is no different, but the problems that arise with my
+            solution seems to have less effect on the top ten finishers. The problem arises from the back half of the grid, 
+            where the models often have a very difficult time predicting anything after p15. Although this is a problem in 
+            predicting how the entire grid will finish, if only the first ten positions matter, p15 through p20 don't really
+            matter. I may try adding a finish/not finish column to the data, or come up with a different solution entirely,
+            but the models work well enough for their intended purpose.
+        </p>
+        <p>
+            This isn't an exhaustive list of every problem, rather overviews of some of the bigger problems I have either
+            dealt with or haven't quite figured out a perfect solution for.
+        </p>
+    </main>
+<script src="script.js"></script>
+</body>
+</html>

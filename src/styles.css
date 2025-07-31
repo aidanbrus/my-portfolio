@@ -1,0 +1,123 @@
+/* general page elements*/
+body {
+    background-color: rgb(190, 52, 25);
+}
+
+p {
+    font-family: Verdana;
+    font-size: 20px;
+    font-weight: 150;
+    background-color: rgb(194, 194, 194, 0.4);
+    border: 2px hidden;
+    border-radius: 4px;
+}
+
+h1 {
+    font-family: Tahoma;
+    font-size: 50px;
+    font-weight: 300;
+    background-color: aliceblue;
+    border: 2px hidden;
+    border-radius: 8px;
+}
+
+h2 {
+    font-family: Verdana;
+    font-size: 30px;
+    font-weight: 200;
+
+}
+
+body {
+  padding-top: 60px; /* Add enough padding so your content doesn’t go under the navbar */
+}
+
+/* navbar elements */
+* {
+  box-sizing: border-box;
+}
+
+nav {
+  position: sticky;
+  width: 100%;
+  background-color: #333;
+  box-sizing: border-box;
+  margin: 0 auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  /*z-index: 1;*/
+}
+
+.navbar {
+  /*position: sticky;*/
+  display: flex;
+  justify-content: left;
+  background-color: #333;
+  list-style-type: none;
+  box-sizing: border-box;
+  /*overflow: hidden;*/
+  padding: 0;
+  margin: 0 auto;
+}
+
+.navbar li {
+  margin: 15px;
+}
+
+.navbar a {
+  text-decoration: none;
+  /*float: left;*/
+  /*display: block;*/
+  position: relative;
+  z-index: 1;
+  /*transition: rgb(255,255,255) 0.3s;*/
+  padding: 15px 30px;
+  color: rgb(255,255,255);
+}
+
+.navbar a:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  bottom: 50%;
+  right: 0;
+  width: 100%;
+  height: 0%;
+  background-color: rgb(125,125,125, 0.2);
+  transition: width 0.0s, height 0.4s, bottom 0.4s, top 0.4s;
+  z-index: -1;
+}
+
+.navbar a:hover {
+  color: #FFFFFF;
+}
+
+.navbar a:hover:after {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  top: 0;
+}
+
+/* Sticky effect when scrolling */
+.sticky {
+  position: fixed;
+  top: 0;
+  left: 10;
+  right: 10;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 1000;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* To avoid layout shift when navbar becomes sticky */ 
+.sticky-placeholder {
+  height: 0;
+}

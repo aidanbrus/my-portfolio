@@ -1,0 +1,159 @@
+<!-- This is the about findings, more indepth analysis of the models-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Models and Methods</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- I think is where to link page to css-->
+</head>
+<body>
+    <header>
+        <h1> Model and Method Analysis </h1>
+        <nav id="navbar">
+            <ul class="navbar">
+                <!-- log on navbar would be cool-->
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">F1 Predictions</a></li>
+                <li><a href="results.html">Analysis</a></li>
+                <li><a href="profile.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Basic Methods For Models</h2>
+        <p>
+            The most basic idea for these models was to try and predict the outcome of F1 races using information that can be obtained
+            before the race. I didn't want any information from the current race, which limited me to information available up to the
+            end of qualifying. This includes historical information, which I do use in some of the models. 
+        </p>
+        <p>
+            Each model is built using pytorch in jupyter notebooks. I chose jupyter notebooks because I am familiar with them but 
+            also I wanted to use pytorch for building the models, largely because I am comfortable with python already. Knowing 
+            python allowed me to spend more time learning pytorch and focusing on the performance of the models than on the basics
+            of python. For most of the information I am using the FastF1 repository, which has most of the relevant data I am using
+            for training. There are a few values I either collect or calculated myself, but most values were gathered from FastF1.
+        </p>
+        <p>
+            Each model featured here is unique in one of the following ways: training data, optimizer, or loss fuction. Currently, I 
+            haven't noticed any significant difference in actual model structure, be it layers or even nodes per layer. More of this
+            information will be featured on the results page, if you are interested in these observations. The hope is to feature a
+            variety of models to see how difference in approach efffect the overall efficacy of the predictions.
+        </p>
+        <h2>Race Predictions - Model Analysis and Error</h2>
+            <p>
+                To test the efficacy of a given model and its set up, I used a variety of different metrics to measure performace.
+                The first method was graphic the actual results of races agaisnt what the model was predicting. Graphing predicted
+                finish against actual finish produces a graph that can easily be read to see how well the model is performing. 
+                <!--picture of the graph here-->
+                Figure 1 servers an average example of what the graph looked like for many of models. It may look like a lot of noise
+                at first, but look at enough and you start to see some trends. Just qualitatively looking at a graph doesn't provide 
+                strong evidence to performance, but it does easily tell if a set up isn't very good. 
+                <!--picture of a horizontal graph here, maybe include optimizer and loss names--> 
+                Some set ups, be it the optimizer or the loss function, produce graphs like figure 2. These graphs quickly tell me 
+                that the given set up of model, optimizer, and loss function don't work together and I should try a different
+                combinaton.
+            </p> 
+            <p>
+                The next way I tested the models was to look at average training and validaion loss. Average can be a bit scary,
+                especially given I am taking the average of 20 points, so extreme outliers could become very problematic. So, 
+                there were two ways that I looked at loss, magnitude and trends. For magnitude, I would print out losses every 
+                five or ten epochs to see the quantitative amount of loss, which I could easily compare to other models and 
+                setups. If the current set up seemed to be competent, I would then graph out the loss to see the overall behavior
+                of the loss. I was looking at the long-term end behavior of loss to judge performance. If the long-term behavior
+                was flat and stable, then the model had reached a stable equilibrium: either all points were equally optimized or
+                there were some outliers but outliers were consistently present and optimized. If the long-term behavior was
+                jagged, or average error greatly varied epoch to epoch, then the model likely couldn't truly reach an
+                equilibrium, be it from the model or model set up. Jagged is a quite qualitative measure, but changes greater 
+                <!--look at data and good models to see how much variance the--> in the magnitude of loss were considered 
+                "jagged".   
+            </p>
+            <p>
+                Using these two main methods were how I picked out models to potentially use for predictions. However,
+                once the model was saved, I would then run different tests on the model, to see how the model performed on new
+                data. <!--include the couple of metrics i have to see how well the saved models performed-->
+            </p>
+            <p>
+                No good analysis would be with out error. I did look at model loss in choosing models, but as I mention in the
+                <a href="about.html">About</a> page, these models are not without there problems. The biggest problem these models
+                expereince is DNF's and incomplete data. DNF's pose a weird problem as they need a numeric value to be placed into 
+                a pytorch tensor. However, there were two ways I saw to address this problem, either give zeros in place of DNF's 
+                or give drivers a pseudo-finish position even though the didn't finish. The idea for the psedo-finish position was
+                if a driver DNF-ed a race, it would almost be equivalent to get 20th: driver gets no points and p20 is a bad finish,
+                like a DNF. The other method would be to fill DNF's with a zero. Since the model is looking to rank drivers 1-20, 
+                a zero feels akin to a null value for the tensor. Since I got the data from FastF1, the drivers were already assigned
+                a finishing order, which would just place drivers who DNF-ed in the back. Rather than change DNF's to zero, I 
+                maintained the pseudo-finish order idea. Although easy to implement, this did cause a new problem, as I coined,
+                the p15 problem. Looking at the figure 1 above you likely noticed to things: one, the model remains close for 
+                p1-p10 and two, above about p15, the efficacy of the model drastically declines. I coined it the p15 problem as 
+                most model either reached this problem around p14 to p16. This problem is likely due to how I handle DNF's. 
+                Since any driver at any time can DNF but the model itself isn't predicting DNF's, when a driver does DNF, especially
+                from a position above p12 or p10, the model looks increadibly wrong as the likely predict a p10 driver to finish
+                around p10, not p20. Given the simplicity of the models and how I treat DNF's in the data, it is very unlikely for
+                model to ever predict the last couple of places accurately as those last couple of place are more likely to be 
+                driver DNF's than actual performance.  
+            </p>
+            <p>
+                Now one problem you may see is if you use finishing places for any other value, your data would be skewed. 
+                This would only be a problem for values like recent team strength or recent driver strength. However, to calculate
+                these values I use points scored, either as team or driver, not what place they finish. If I use this method for 
+                DNF for other models, it is something I do have to take into consideration.
+            </p>
+        <h3>Model 1</h3>
+        <h4>Information and Set Up</h4>
+        <p>
+            Model 1 is the first model I completed, and thus is rather simple. It has 8 variables it tracks: driver, team, 
+            recent team performance, starting position, driver experience,... Given this model was a test to see if I could 
+            make a functioning model, the scope was rather small. Beyond the rather small amount of elements per race, the 
+            data I included is only from the 2022 season onward. 
+        </p>
+        <p>
+            For model struture, I used three layers, at 64-128-10, for the model. I then used the ADAM optimizer, the one included
+            in the pytorch package, and the --- loss function. When testing node structure, I found very little impact on overall
+            performance on the amount. I varied the amount per layer from 10 to 256 and found that there wasn't very large
+            differences in performance. This may be due to the rather small training set I gave the models, and had I given more 
+            races there would've become a clear discrepency between models, but for this set up there wasn't a significant difference.
+            <!--I should get some numbers and thoroughly test the lack of discrepency-->
+            For layer structure, there was an upper bound to how many layers were effective. At very low layers, adding a layer did
+            improve the overall stability of predictions. However, above four layers, there seemed to be little to no impact 
+            from adding another layer. 
+        </p>
+        <h4>Analysis</h4>
+        <p>
+            As my first model, I think it turned out successfully. I tested  five different optimizers and six different loss 
+            functions to see how well the model could perform. The combination of ADAM and <!--loss function--> produced stable 
+            and minimized loss. <!--talk about specific loss values and compare to other-->. Even when using the set function to
+            predict new race results, the model still performed well. <!--talk about specific values here and compare-->
+        </p>
+        <p>
+            Although small in scope with a small training data set, I do believe that this first model was a success.
+        </p>
+        <h3>Model 2</h3>
+        <h4>Information and Set Up</h4>
+        <p>
+            Model 2 is very similar to model 1, rather it use much more data per race than model 1. The two models
+            share the same amount of training data, only from 2022-2024, but model 2 use double the amount of data 
+            comparitavely. Model 2 uses all the data that model 1 uses, but also inculdes the following data:
+            tempurature, rain, track type, average number of safety cars, average number of yellow flags, average amount of 
+            pitsops, time of day, and track ID. Averages were done on a per track basis and only included the years for which
+            the data spanned (2022-2024). Track type was a binary value to determine if a track was street circuit or 
+            dedicated circuit. Time of day was also made binary, distinguishing only between day and night races. 
+        </p>
+        <p>
+            The goal of model 2 was to see how adding more information would improve the overall performance of these models, while
+            also filling in some gaps. I'm sure some of you read track ID and realized that model 1 didn't even include what track 
+            the race was at, which seems like very important information for a race predictor. So model 2 aimed to fixed shortcomings
+            while also increasing fidelity of predictions.
+        </p>
+        <p>
+            Given the similarities to model 1, I tried many of the same structures, optimizers, and loss fuctions. For layer and 
+            node structure, I landed on a 4 layer model with a node structure of 20-128-64-20. A lot of the code from model 1 
+            was esily integrated into model 2, with only additional code being added on.
+        </p>
+        <h4>Analysis</h4>
+        <p>
+            Unsurprisingly, model 2 behaved in a similar was to model 1, leaving a lot of the analysis very similar. 
+            <!--once model 2 is up and running, talk about what i saw with some actual data.-->
+        </p>
+    </main>
+<script src="script.js"></script>
+</body>
