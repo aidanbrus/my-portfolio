@@ -1,43 +1,18 @@
-<!-- This is main landing page for the website-->
-<!-- This page will have the all predictions for the current race of the weekend and some jsut general info stuff-->
-<!-- Pages I need to make and link to: about the project, about me, and history of performance and metrics of models-->
-<!-- Need a bar to go from page to page so you can easily go between. might need to make a year selector (?)-->
+<!--This will become the new landing page, with animations-->
+<!--current idea is to create a track as an animatable object so to have full control of it.
+I can then animate into the track, hopefully bipassing needing to generate key frames.
+It also might make "driving" down the track easier to animate. -->
+<!--Need to make track item next that can be animated-->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>Home</title>
-    <!-- link style sheet here for this page-->
-    <link rel="stylesheet" href="styles.css">
-</head>   
-<body>
-    <header>
-        <h1> F1 Predictions </h1>
-        <nav id="navbar">
-            <ul class="navbar">
-                <!-- logo on navbar would be cool-->
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">F1 Predictions</a></li>
-                <li><a href="results.html">Analysis</a></li>
-                <li><a href="profile.html">About</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <p>
-            These models are meant to predict the outcome of the race only using qualifying information from the current session
-            as well as relevent data that is known or quantified before the race. For more indepth information on the models,
-            training, and methodolgy, visit the <a href="results.html">Analysis</a> page.
-        </p>
-        <head>
-            <h2>Weekly Race Results Predictions</h2>
-            <p>
-                This weeks race:   <!--see if i can't link this to the excel sheet with the table info-->
-            </p>
-            <!-- where the tables of info will go-->
-            <div id="table-container"></div>
-            
-        </head>
-    </main>
-<script src="script.js"></script>
-</body>
+  <head>
+    <meta charset="utf-8">
+    <title>My first three.js app</title>
+    <style>
+      body { margin: 0; }
+    </style>
+  </head>
+  <body>
+    <script type="module" src="/src/homepg.js"></script>
+  </body>
 </html>
