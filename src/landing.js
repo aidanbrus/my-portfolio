@@ -1,5 +1,6 @@
 // All the code for make the animations and background design for the home page in js
 // main.js
+console.log("Landing.js loaded");
 import * as THREE from 'three';
 
 // Create scene
