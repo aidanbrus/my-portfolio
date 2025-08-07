@@ -45,32 +45,59 @@ const material = new THREE.LineBasicMaterial({
 });
 
 const points = [];
-points.push( new THREE.Vector3( 5.2, 0, 0 ) );
-points.push( new THREE.Vector3( -7.8, 0, 0 ) ); // turn 1 start
-points.push( new THREE.Vector3( -8, 0.25, 0) );
-points.push( new THREE.Vector3( -7.8, 0.5, 0 ) ); // turn 1 end
-points.push( new THREE.Vector3(-5.8, 2, 0) ); // turn 1a
-points.push( new THREE.Vector3(-1, 2, 0) ); // turn 2 start
-points.push( new THREE.Vector3( -0.7, 2.5, 0) );
-points.push( new THREE.Vector3(-0.9, 3, 0 ) ); // turn 2 end
-points.push( new THREE.Vector3( -3.3, 4, 0) ); // turn 3
+points.push( new THREE.Vector3( 5.2, 0.5, 0 ) ); // almost star line actually
+points.push( new THREE.Vector3( -7.6, 0.5, 0 ) ); // turn 1 start
+points.push( new THREE.Vector3( -7.85, 0.55, 0) );
+points.push( new THREE.Vector3( -7.9, 0.6, 0) );
+points.push( new THREE.Vector3( -7.9, 0.8, 0) );
+points.push( new THREE.Vector3( -7.8, 0.9, 0) );
+points.push( new THREE.Vector3( -7.6, 1.1, 0 ) ); // turn 1 end
+points.push( new THREE.Vector3(  -6.6, 1.75, 0) ); // turn 1a start
+points.push( new THREE.Vector3( -6.1, 1.9, 0) ); 
+points.push( new THREE.Vector3( -5.8, 2, 0) ); // turn 1a end
+points.push( new THREE.Vector3( -1, 2, 0) ); // turn 2 start
+points.push( new THREE.Vector3( -0.8, 2.1, 0) );
+points.push( new THREE.Vector3( -0.7, 2.2, 0) );
+points.push( new THREE.Vector3( -0.6, 2.5, 0) );
+points.push( new THREE.Vector3( -0.63, 2.7, 0) );
+points.push( new THREE.Vector3( -0.8, 2.9, 0) );
+points.push( new THREE.Vector3(-0.9, 2.95, 0 ) ); // turn 2 end
+points.push( new THREE.Vector3( -3.1, 3.85, 0) ); // turn 3 start
+points.push( new THREE.Vector3( -3.25, 4, 0) );
+points.push( new THREE.Vector3( -3.4, 4.3, 0) ); // turn 3 end
+points.push( new THREE.Vector3( -4.4, 8.5, 0) );
 points.push( new THREE.Vector3( -4.5, 9.75, 0) );
-points.push( new THREE.Vector3( -4.5, 10.75, 0) ); // turn 4
-points.push( new THREE.Vector3( -7, 12.4, 0 ) ); // turn 5 start
-points.push( new THREE.Vector3( -7.1, 13, 0) ); 
-points.push( new THREE.Vector3( -6.7, 13.8, 0) );
-points.push( new THREE.Vector3( -6, 14.1, 0) ); // turn 5 end
-points.push( new THREE.Vector3( -1, 13.6, 0) ); // turn 6
-points.push( new THREE.Vector3( -1, 12.8, 0) ); // turn 7
-points.push( new THREE.Vector3( 1, 11.5, 0) ); // turn 8
-points.push( new THREE.Vector3( 2.5, 12.5, 0) ); // turn 9
-points.push( new THREE.Vector3( 4, 10.25, 0) ); // turn 10
-points.push( new THREE.Vector3( 6.2, 9.7, 0) ); // turn 11 start
-points.push( new THREE.Vector3( 6.4, 9.5, 0) ); 
-points.push( new THREE.Vector3( 6.35, 9.2, 0) ); // turn 11 end
-points.push( new THREE.Vector3( 6.05, 2.95, 0) ); // turn 12 start
+points.push( new THREE.Vector3( -4.5, 10, 0) ); // turn 4 start
+points.push( new THREE.Vector3( -4.45, 10.75, 0) );
+points.push( new THREE.Vector3( -4.6, 11, 0) );
+points.push( new THREE.Vector3( -5, 11.4, 0) ); // turn 4 end
+points.push( new THREE.Vector3( -6, 12.2, 0 ) ); // turn 5 start
+points.push( new THREE.Vector3( -6.7, 13, 0) ); 
+points.push( new THREE.Vector3( -6.75, 13.3, 0) );
+points.push( new THREE.Vector3( -6.7, 13.6, 0) );
+points.push( new THREE.Vector3( -6.35, 13.9, 0) );
+points.push( new THREE.Vector3( -6, 14, 0) ); // turn 5 end
+points.push( new THREE.Vector3( -1.1, 13.7, 0) ); // turn 6 start
+points.push( new THREE.Vector3( -1, 13.6, 0) );
+points.push( new THREE.Vector3( -1, 13.5, 0) ); // turn 6 end
+points.push( new THREE.Vector3( -1, 12.9, 0) ); // turn 7 start
+points.push( new THREE.Vector3( -0.95, 12.75, 0) ); 
+points.push( new THREE.Vector3( -0.8, 12.6, 0) );// turn 7 end
+points.push( new THREE.Vector3( 0.6, 11.6, 0) ); // turn 8 start
+points.push( new THREE.Vector3( 1, 11.5, 0) ); 
+points.push( new THREE.Vector3( 1.4, 11.6, 0) ); // turn 8 end
+points.push( new THREE.Vector3( 2.2, 12.2, 0) ); // turn 9 start
+points.push( new THREE.Vector3( 2.5, 12.25, 0) );
+points.push( new THREE.Vector3( 2.8, 12, 0) ); // turn 9 end
+points.push( new THREE.Vector3( 3.6, 11, 0) ); // turn 10 start
+points.push( new THREE.Vector3( 4.1, 10.3, 0) ); 
+points.push( new THREE.Vector3( 4.5, 10.1, 0) ); // turn 10 end
+points.push( new THREE.Vector3( 5.75, 9.7, 0) ); // turn 11 start
+points.push( new THREE.Vector3( 6.2, 9.3, 0) ); 
+points.push( new THREE.Vector3( 6.3, 9, 0) ); // turn 11 end
+points.push( new THREE.Vector3( 6.05, 3.1, 0) ); // turn 12 start
 points.push( new THREE.Vector3( 6, 2.9, 0) );
-points.push( new THREE.Vector3( 5.95, 2.85, 0) ); //turn 12 end
+points.push( new THREE.Vector3( 5.85, 2.85, 0) ); //turn 12 end
 points.push( new THREE.Vector3( 3.7, 3.3, 0) ); // turn 12a
 points.push( new THREE.Vector3( 2.9, 3.3, 0) ); // turn 13 start
 points.push( new THREE.Vector3( 2.6, 3.2, 0) );
@@ -80,12 +107,14 @@ points.push( new THREE.Vector3( 2.35, 2.45, 0) );
 points.push( new THREE.Vector3( 2.6, 2.1, 0) );
 points.push( new THREE.Vector3( 2.9, 2, 0) ); // turn 13 end
 points.push( new THREE.Vector3( 5.2, 2, 0) ); // turn 14 start
-points.push( new THREE.Vector3( 5.7, 1.8, 0) );
-points.push( new THREE.Vector3( 5.95, 1.3, 0) );
-points.push( new THREE.Vector3( 6, 1, 0) );
-points.push( new THREE.Vector3( 5.95, 0.7, 0) );
-points.push( new THREE.Vector3( 5.7, 0.2, 0) );
-points.push( new THREE.Vector3( 5.2, 0, 0) ); // turn 14 end
+points.push( new THREE.Vector3( 5.5, 1.93, 0) );
+points.push( new THREE.Vector3( 5.8, 1.71, 0) );
+points.push( new THREE.Vector3( 5.95, 1.44, 0) );
+points.push( new THREE.Vector3( 6, 1.25, 0) );
+points.push( new THREE.Vector3( 5.95, 1.05, 0) );
+points.push( new THREE.Vector3( 5.8, 0.79, 0) );
+points.push( new THREE.Vector3( 5.5, 0.57, 0) );
+points.push( new THREE.Vector3( 5.2, 0.5, 0) ); // turn 14 end
 
 const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
