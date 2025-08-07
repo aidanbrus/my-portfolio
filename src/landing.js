@@ -37,7 +37,7 @@ document.body.appendChild(renderer.domElement);
 //}
 
 camera.position.x = 0;
-camera.position.y = 4;
+camera.position.y = 7;
 camera.position.z = 15;
 
 const material = new THREE.LineBasicMaterial({
@@ -45,31 +45,47 @@ const material = new THREE.LineBasicMaterial({
 });
 
 const points = [];
-points.push( new THREE.Vector3( 2.9, 0, 0 ) );
-points.push( new THREE.Vector3( -5, 0, 0 ) );
-points.push( new THREE.Vector3( -5.05, 0.05, 0 ) );
-points.push( new THREE.Vector3(-4, 1, 0) );
-points.push( new THREE.Vector3(-0.5, 1, 0) );
-points.push( new THREE.Vector3(-0.25, 1.25, 0 ) );
-points.push( new THREE.Vector3( -1.25, 1.5, 0) );
-points.push( new THREE.Vector3( -2, 5.5, 0) );
-points.push( new THREE.Vector3( -4.5, 6.5, 0 ) );
-points.push( new THREE.Vector3( -4.6, 7, 0) );
-points.push( new THREE.Vector3( -4.4, 7.5, 0) );
-points.push( new THREE.Vector3( -0.5, 7.3, 0) );
-points.push( new THREE.Vector3( -0.5, 7.2, 0) );
-points.push( new THREE.Vector3( 0.5, 6.2, 0) );
-points.push( new THREE.Vector3( 1, 6.8, 0) );
-points.push( new THREE.Vector3( 2, 5.8, 0) );
-points.push( new THREE.Vector3( 3.2, 5.5, 0) );
-points.push( new THREE.Vector3( 3, 1.5, 0) );
-points.push( new THREE.Vector3( 2.5, 1.8, 0) );
-points.push( new THREE.Vector3( 2, 1.5, 0) );
-points.push( new THREE.Vector3( 1.9, 1.25, 0) );
-points.push( new THREE.Vector3( 2, 1, 0) );
-points.push( new THREE.Vector3( 2.9, 1, 0) );
-points.push( new THREE.Vector3( 3.1, 0.5, 0) );
-points.push( new THREE.Vector3( 2.9, 0, 0) );
+points.push( new THREE.Vector3( 5.2, 0, 0 ) );
+points.push( new THREE.Vector3( -7.8, 0, 0 ) ); // turn 1 start
+points.push( new THREE.Vector3( -8, 0.25, 0) );
+points.push( new THREE.Vector3( -7.8, 0.5, 0 ) ); // turn 1 end
+points.push( new THREE.Vector3(-5.8, 2, 0) ); // turn 1a
+points.push( new THREE.Vector3(-1, 2, 0) ); // turn 2 start
+points.push( new THREE.Vector3( -0.7, 2.5, 0) );
+points.push( new THREE.Vector3(-0.9, 3, 0 ) ); // turn 2 end
+points.push( new THREE.Vector3( -3.3, 4, 0) ); // turn 3
+points.push( new THREE.Vector3( -4.5, 9.75, 0) );
+points.push( new THREE.Vector3( -4.5, 10.75, 0) ); // turn 4
+points.push( new THREE.Vector3( -7, 12.4, 0 ) ); // turn 5 start
+points.push( new THREE.Vector3( -7.1, 13, 0) ); 
+points.push( new THREE.Vector3( -6.7, 13.8, 0) );
+points.push( new THREE.Vector3( -6, 14.1, 0) ); // turn 5 end
+points.push( new THREE.Vector3( -1, 13.6, 0) ); // turn 6
+points.push( new THREE.Vector3( -1, 12.8, 0) ); // turn 7
+points.push( new THREE.Vector3( 1, 11.5, 0) ); // turn 8
+points.push( new THREE.Vector3( 2.5, 12.5, 0) ); // turn 9
+points.push( new THREE.Vector3( 4, 10.25, 0) ); // turn 10
+points.push( new THREE.Vector3( 6.2, 9.7, 0) ); // turn 11 start
+points.push( new THREE.Vector3( 6.4, 9.5, 0) ); 
+points.push( new THREE.Vector3( 6.35, 9.2, 0) ); // turn 11 end
+points.push( new THREE.Vector3( 6.05, 2.95, 0) ); // turn 12 start
+points.push( new THREE.Vector3( 6, 2.9, 0) );
+points.push( new THREE.Vector3( 5.95, 2.85, 0) ); //turn 12 end
+points.push( new THREE.Vector3( 3.7, 3.3, 0) ); // turn 12a
+points.push( new THREE.Vector3( 2.9, 3.3, 0) ); // turn 13 start
+points.push( new THREE.Vector3( 2.6, 3.2, 0) );
+points.push( new THREE.Vector3( 2.35, 2.85, 0) );
+points.push( new THREE.Vector3( 2.3, 2.65, 0) ); 
+points.push( new THREE.Vector3( 2.35, 2.45, 0) );
+points.push( new THREE.Vector3( 2.6, 2.1, 0) );
+points.push( new THREE.Vector3( 2.9, 2, 0) ); // turn 13 end
+points.push( new THREE.Vector3( 5.2, 2, 0) ); // turn 14 start
+points.push( new THREE.Vector3( 5.7, 1.8, 0) );
+points.push( new THREE.Vector3( 5.95, 1.3, 0) );
+points.push( new THREE.Vector3( 6, 1, 0) );
+points.push( new THREE.Vector3( 5.95, 0.7, 0) );
+points.push( new THREE.Vector3( 5.7, 0.2, 0) );
+points.push( new THREE.Vector3( 5.2, 0, 0) ); // turn 14 end
 
 const geometry = new THREE.BufferGeometry().setFromPoints( points );
 
