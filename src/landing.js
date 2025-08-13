@@ -118,18 +118,18 @@ const points = curve.getPoints( 100 );
 
 // extrude track from line
 // width->thick and vice versa
-const thickTrack = 4, widthTrack = 2;
+const thickTrack = 4, widthTrack = 4;
 
 const shape = new THREE.Shape();
 shape.moveTo( -widthTrack/2,thickTrack/2 );
 shape.lineTo( -widthTrack/2, thickTrack/2 );
-shape.lineTo( widthTrack, thickTrack/2 );
+shape.lineTo( widthTrack/2, thickTrack/2 );
 shape.lineTo( widthTrack/2, -thickTrack/2 );
 shape.lineTo( -widthTrack/2, -thickTrack/2 );
 
 const extrudeSettings = {
 	steps: 1000,
-	depth: 10,
+	depth: 4,
 	bevelEnabled: false,
 	//bevelThickness: 1,
 	//bevelSize: 1,
@@ -139,7 +139,9 @@ const extrudeSettings = {
 };
 
 const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+// .MeshPhongMaterial({color: '#8AC'})
+// .MeshBasicMaterial( { color: 0x00ff00 } )
+const material = new THREE.MeshPhongMaterial({color: '#8AC'});
 const mesh = new THREE.Mesh( geometry, material ) ;
 scene.add( mesh );
 
@@ -156,6 +158,16 @@ scene.add( mesh );
 // renderer.render(scene,camera);
 
 // Render loop, orbit camera
+
+// adding directional lighting for perspective
+const color = 0xFFFFFF;
+const intensity = 2;
+const light = new THREE.DirectionalLight(color, intensity);
+light.position.set(20, 50, 150);
+light.target.position.set(0, 50, 0);
+scene.add(light);
+scene.add(light.target);
+
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
