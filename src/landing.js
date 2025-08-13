@@ -118,30 +118,82 @@ const points = curve.getPoints( 100 );
 
 // extrude track from line
 // width->thick and vice versa
-const thickTrack = 4, widthTrack = 4;
+//const thickTrack = 4, widthTrack = 2;
 
-const shape = new THREE.Shape();
-shape.moveTo( -widthTrack/2,thickTrack/2 );
-shape.lineTo( -widthTrack/2, thickTrack/2 );
-shape.lineTo( widthTrack/2, thickTrack/2 );
-shape.lineTo( widthTrack/2, -thickTrack/2 );
-shape.lineTo( -widthTrack/2, -thickTrack/2 );
+// const shape = new THREE.Shape();
+// shape.moveTo( -widthTrack/2, thickTrack/2 );
+//shape.lineTo( -widthTrack/2, thickTrack/2 );
+// shape.lineTo( widthTrack/2, thickTrack/2 );
+// shape.lineTo( widthTrack/2, -thickTrack/2 );
+// shape.lineTo( -widthTrack/2, -thickTrack/2 );
 
-const extrudeSettings = {
-	steps: 1000,
-	depth: 4,
-	bevelEnabled: false,
+//const extrudeSettings = {
+//	steps: 1000,
+//	depth: 4,
+//	bevelEnabled: false,
 	//bevelThickness: 1,
 	//bevelSize: 1,
 	//bevelOffset: 0,
 	//bevelSegments: 5,
-  extrudePath: curve
-};
+//  extrudePath: curve
+//};
+const thickTrack = 4, widthTrack = 2;
 
-const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+const shape = [
+    new THREE.Vector2(-widthTrack/2, -thickTrack/2),
+    new THREE.Vector2( widthTrack/2, -thickTrack/2),
+    new THREE.Vector2( widthTrack/2,  thickTrack/2),
+    new THREE.Vector2(-widthTrack/2,  thickTrack/2)//,
+    // new THREE.Vector2(-widthTrack/2, -thickTrack/2)
+];
+
+const up = new THREE.Vector3(0, 0, 1); // fixed up direction
+
+const steps = 1000;
+const positions = [];
+const vertices = [];
+
+for (let i = 0; i < steps; i++) {
+  const t = i / (steps - 1);
+  const point = curve.getPoint(t);
+  const tangent = curve.getTangent(t).normalize();
+  const normal = new THREE.Vector3().crossVectors(up, tangent).normalize();
+  const binormal = new THREE.Vector3().crossVectors(tangent, normal).normalize();
+
+  // push shape vertices transformed into 3D space
+  for (let p = 0; p < shape.length; p++) {
+      const sp = shape[p];
+      const vertex = new THREE.Vector3()
+          .addScaledVector(normal, sp.x)
+          .addScaledVector(binormal, sp.y)
+          .add(point);
+      positions.push(vertex.x, vertex.y, vertex.z);
+    }
+
+  // create indices for faces (connect to previous segment)
+  if (i > 0) {
+      const base = i * shape.length;
+      const prevBase = (i - 1) * shape.length;
+      for (let p = 0; p < shape.length; p++) {
+          const nextP = (p + 1) % shape.length;
+          vertices.push(prevBase + p, base + p, base + nextP);
+          vertices.push(prevBase + p, base + nextP, prevBase + nextP);
+        }
+    }
+    
+}
+
+// assign vertices to geometry (needs indices, uvs, etc. for full mesh)
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+geometry.setIndex(vertices);
+geometry.computeVertexNormals();
+
+
+//const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 // .MeshPhongMaterial({color: '#8AC'})
 // .MeshBasicMaterial( { color: 0x00ff00 } )
-const material = new THREE.MeshPhongMaterial({color: '#8AC'});
+const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 const mesh = new THREE.Mesh( geometry, material ) ;
 scene.add( mesh );
 
@@ -161,7 +213,7 @@ scene.add( mesh );
 
 // adding directional lighting for perspective
 const color = 0xFFFFFF;
-const intensity = 2;
+const intensity = 3;
 const light = new THREE.DirectionalLight(color, intensity);
 light.position.set(20, 50, 150);
 light.target.position.set(0, 50, 0);
