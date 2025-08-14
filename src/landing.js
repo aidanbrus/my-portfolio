@@ -45,27 +45,32 @@ controls.dampingFactor = 0.05;
   new THREE.Vector3( -61, 19, 0),
   new THREE.Vector3( -58, 20, 0), // turn 1a end
   new THREE.Vector3( -10, 20, -5), // turn 2 start
-  new THREE.Vector3( -8, 21, -5.5),
-  new THREE.Vector3( -7, 22, -6.5),
-  new THREE.Vector3( -6, 25, -8),
-  new THREE.Vector3( -6.3, 27, -9),
-  new THREE.Vector3( -8, 29, -10),
-  new THREE.Vector3(-9, 29.5, -10), // turn 2 end
-  new THREE.Vector3( -31, 38.5, -12), // turn 3 start
-  new THREE.Vector3( -32.5, 40, -13.5),
-  new THREE.Vector3( -34, 43, -14), // turn 3 end
-  new THREE.Vector3( -44, 85, -13.8),
-  new THREE.Vector3( -45, 97.5, -13.3),
-  new THREE.Vector3( -45, 100, -12.5), // turn 4 start
-  new THREE.Vector3( -44.5, 107.5, -12),
-  new THREE.Vector3( -46, 110, -11),
-  new THREE.Vector3( -50, 114, -10), // turn 4 end
-  new THREE.Vector3( -60, 122, -8.5), // turn 5 start
-  new THREE.Vector3( -67, 130, -7),
-  new THREE.Vector3( -67.5, 133, -6.5),
-  new THREE.Vector3( -67, 136, -5.5), 
-  new THREE.Vector3( -63.5, 139, -4), 
-  new THREE.Vector3( -60, 140, -3), // turn 5 end
+  new THREE.Vector3( -8, 21, -5),
+  new THREE.Vector3( -7, 22, -5),
+  new THREE.Vector3( -6, 25, -5),
+  new THREE.Vector3( -6.3, 27, -5),
+  new THREE.Vector3( -7, 28, -5),
+  //new THREE.Vector3( -8.3, 28.9, -9.75),
+  new THREE.Vector3( -8, 29, -5),
+  new THREE.Vector3( -8.5, 29.25, -5 ),
+  new THREE.Vector3( -9, 29.5, -5), // turn 2 end
+  new THREE.Vector3( -12, 31, -5.25),
+  new THREE.Vector3( -18, 33, -5.5), 
+  new THREE.Vector3( -31, 38.5, -8), // turn 3 start
+  new THREE.Vector3( -32.5, 40, -8),
+  new THREE.Vector3( -34, 43, -8), // turn 3 end
+  new THREE.Vector3( -44, 85, -4.5),
+  new THREE.Vector3( -45, 97.5, -4.25),
+  new THREE.Vector3( -45, 100, -4), // turn 4 start
+  new THREE.Vector3( -44.5, 107.5, -3.8),
+  new THREE.Vector3( -46, 110, -3.6),
+  new THREE.Vector3( -50, 114, -3.4), // turn 4 end
+  new THREE.Vector3( -60, 122, -3.2), // turn 5 start
+  new THREE.Vector3( -67, 130, -3),
+  new THREE.Vector3( -67.5, 133, -2.8),
+  new THREE.Vector3( -67, 136, -2.6), 
+  new THREE.Vector3( -63.5, 139, -2.4), 
+  new THREE.Vector3( -60, 140, -2.2), // turn 5 end
   new THREE.Vector3( -11, 136.5, -2), // turn 6 start
   new THREE.Vector3( -10, 136, -1.8), 
   new THREE.Vector3( -10, 135, -1.6), // turn 6 end
@@ -104,7 +109,8 @@ controls.dampingFactor = 0.05;
   new THREE.Vector3( 58, 7.9, 0),
   new THREE.Vector3( 55, 5.7, 0),
   new THREE.Vector3( 52, 5, 0), // turn 14 end
-  new THREE.Vector3( 51, 5, 0)
+  new THREE.Vector3( 51.5, 5, 0),
+  new THREE.Vector3( 51, 5, 0),
  ] )
 
 const points = curve.getPoints( 100 );
@@ -158,26 +164,67 @@ const shape = [
 
 const up = new THREE.Vector3(0, 0, 1); // fixed up direction
 
-const steps = 2500;
+function getAdaptivePoints(curve, baseDivisions = 500, maxExtra = 8) {
+  const points = [];
+  
+  let prevTangent = null;
+  
+  for (let i = 0; i <= baseDivisions; i++) {
+    const t = i / baseDivisions;
+    const point = curve.getPoint(t);
+    const tangent = curve.getTangent(t).normalize();
+    
+    if (prevTangent) {
+      // Curvature measure = how much direction changes
+      const angle = Math.acos(Math.min(Math.max(prevTangent.dot(tangent), -1), 1));
+      
+      // Map angle to number of extra segments
+      const extra = Math.ceil((angle / Math.PI) * maxExtra);
+      
+      // Add intermediate points if curvature is high
+      for (let j = 1; j <= extra; j++) {
+        const t2 = (i - 1 + j / (extra + 1)) / baseDivisions;
+        points.push(curve.getPoint(t2));
+      }
+    }
+    
+    points.push(point);
+    prevTangent = tangent;
+  }
+  
+  return points;
+}
+
+
 const positions = [];
 const indices = [];
 
 let prevNormal = new THREE.Vector3(1, 0, 0); // starting guess
 
-for (let i = 0; i < steps; i++) {
-  const t = i / (steps - 1);
-  const point = curve.getPoint(t);
-  const tangent = curve.getTangent(t).normalize();
+const pathPoints = getAdaptivePoints(curve, 200, 8); // base 200, up to 5x more in corners
 
-  if (i > 0) {
-    // Adjust prevNormal to be perpendicular to new tangent (parallel transport)
-    const projection = prevNormal.clone().projectOnVector(tangent);
-    prevNormal.sub(projection).normalize();
-  } else {
-    prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
-  }
+for (let i = 0; i < pathPoints.length; i++) {
+    const point = pathPoints[i];
 
-  const binormal = new THREE.Vector3().crossVectors(tangent, prevNormal).normalize();
+    // Compute tangent directly from neighboring points
+    let tangent;
+    if (i === 0) {
+        tangent = pathPoints[i + 1].clone().sub(point).normalize();
+    } else if (i === pathPoints.length - 1) {
+        tangent = point.clone().sub(pathPoints[i - 1]).normalize();
+    } else {
+        tangent = pathPoints[i + 1].clone().sub(pathPoints[i - 1]).normalize();
+    }
+
+    // Parallel transport frame
+    if (i > 0) {
+        const projection = prevNormal.clone().projectOnVector(tangent);
+        prevNormal.sub(projection).normalize();
+    } else {
+        prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
+    }
+
+    const binormal = new THREE.Vector3().crossVectors(tangent, prevNormal).normalize();
 
   // push shape vertices transformed into 3D space
   for (let p = 0; p < shape.length; p++) {
