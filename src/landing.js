@@ -35,30 +35,30 @@ controls.dampingFactor = 0.05;
  const curve = new THREE.CatmullRomCurve3( [
   new THREE.Vector3( 52, 5, 0 ), // almost actual start line 
   new THREE.Vector3( -76, 5, 0 ), // turn 1 start
-  new THREE.Vector3( -78.5, 5, 0),
   new THREE.Vector3( -78.5, 5.5, 0),
+  // new THREE.Vector3( -78.5, 5.5, 0),
   new THREE.Vector3( -79, 6, 0),
-  new THREE.Vector3( -79, 8, 0),
+  // new THREE.Vector3( -79, 8, 0),
   new THREE.Vector3( -78, 9, 0),
   new THREE.Vector3( -76, 11, 0 ), // turn 1 end
   new THREE.Vector3(  -66, 17.5, 0), // turn 1a start
   new THREE.Vector3( -61, 19, 0),
   new THREE.Vector3( -58, 20, 0), // turn 1a end
   new THREE.Vector3( -10, 20, -5), // turn 2 start
-  new THREE.Vector3( -8, 21, -6),
-  new THREE.Vector3( -7, 22, -7),
+  new THREE.Vector3( -8, 21, -5.5),
+  new THREE.Vector3( -7, 22, -6.5),
   new THREE.Vector3( -6, 25, -8),
   new THREE.Vector3( -6.3, 27, -9),
   new THREE.Vector3( -8, 29, -10),
-  new THREE.Vector3(-9, 29.5, -11), // turn 2 end
+  new THREE.Vector3(-9, 29.5, -10), // turn 2 end
   new THREE.Vector3( -31, 38.5, -12), // turn 3 start
   new THREE.Vector3( -32.5, 40, -13.5),
-  new THREE.Vector3( -34, 43, -15), // turn 3 end
-  new THREE.Vector3( -44, 85, -15),
-  new THREE.Vector3( -45, 97.5, -12),
-  new THREE.Vector3( -45, 100, -10), // turn 4 start
-  new THREE.Vector3( -44.5, 107.5, -10),
-  new THREE.Vector3( -46, 110, -10),
+  new THREE.Vector3( -34, 43, -14), // turn 3 end
+  new THREE.Vector3( -44, 85, -13.8),
+  new THREE.Vector3( -45, 97.5, -13.3),
+  new THREE.Vector3( -45, 100, -12.5), // turn 4 start
+  new THREE.Vector3( -44.5, 107.5, -12),
+  new THREE.Vector3( -46, 110, -11),
   new THREE.Vector3( -50, 114, -10), // turn 4 end
   new THREE.Vector3( -60, 122, -8.5), // turn 5 start
   new THREE.Vector3( -67, 130, -7),
@@ -137,63 +137,87 @@ const points = curve.getPoints( 100 );
 	//bevelSegments: 5,
 //  extrudePath: curve
 //};
-const thickTrack = 4, widthTrack = 2;
+const thickTrack = 3, widthTrack = 3;
 
 const shape = [
     new THREE.Vector2(-widthTrack/2, -thickTrack/2),
     new THREE.Vector2( widthTrack/2, -thickTrack/2),
     new THREE.Vector2( widthTrack/2,  thickTrack/2),
-    new THREE.Vector2(-widthTrack/2,  thickTrack/2)//,
-    // new THREE.Vector2(-widthTrack/2, -thickTrack/2)
+    new THREE.Vector2(-widthTrack/2,  thickTrack/2)
 ];
+
+// const shape = new Float32Array( [
+//  -widthTrack/2, -thickTrack/2, 1,
+//  widthTrack/2, -thickTrack/2, 1,
+//  widthTrack/2, thickTrack/2, 1,
+
+//  widthTrack/2, thickTrack/2, 1,
+//  -widthTrack/2, thickTrack/2, 1,
+//  -widthTrack/2, thickTrack/2, 1
+//] );
 
 const up = new THREE.Vector3(0, 0, 1); // fixed up direction
 
-const steps = 1000;
+const steps = 2500;
 const positions = [];
-const vertices = [];
+const indices = [];
+
+let prevNormal = new THREE.Vector3(1, 0, 0); // starting guess
 
 for (let i = 0; i < steps; i++) {
   const t = i / (steps - 1);
   const point = curve.getPoint(t);
   const tangent = curve.getTangent(t).normalize();
-  const normal = new THREE.Vector3().crossVectors(up, tangent).normalize();
-  const binormal = new THREE.Vector3().crossVectors(tangent, normal).normalize();
+
+  if (i > 0) {
+    // Adjust prevNormal to be perpendicular to new tangent (parallel transport)
+    const projection = prevNormal.clone().projectOnVector(tangent);
+    prevNormal.sub(projection).normalize();
+  } else {
+    prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
+  }
+
+  const binormal = new THREE.Vector3().crossVectors(tangent, prevNormal).normalize();
 
   // push shape vertices transformed into 3D space
   for (let p = 0; p < shape.length; p++) {
-      const sp = shape[p];
-      const vertex = new THREE.Vector3()
-          .addScaledVector(normal, sp.x)
-          .addScaledVector(binormal, sp.y)
-          .add(point);
-      positions.push(vertex.x, vertex.y, vertex.z);
-    }
+    const sp = shape[p];
+    const vertex = new THREE.Vector3()
+      .addScaledVector(prevNormal, sp.x)
+      .addScaledVector(binormal, sp.y)
+      .add(point);
+    positions.push(vertex.x, vertex.y, vertex.z);
+  }
 
-  // create indices for faces (connect to previous segment)
+  // create indices for faces
   if (i > 0) {
-      const base = i * shape.length;
-      const prevBase = (i - 1) * shape.length;
-      for (let p = 0; p < shape.length; p++) {
-          const nextP = (p + 1) % shape.length;
-          vertices.push(prevBase + p, base + p, base + nextP);
-          vertices.push(prevBase + p, base + nextP, prevBase + nextP);
-        }
+    const base = i * shape.length;
+    const prevBase = (i - 1) * shape.length;
+    for (let p = 0; p < shape.length; p++) {
+      const nextP = (p + 1) % shape.length;
+      indices.push(prevBase + p, base + p, base + nextP);
+      indices.push(prevBase + p, base + nextP, prevBase + nextP);
     }
-    
+  }
 }
 
 // assign vertices to geometry (needs indices, uvs, etc. for full mesh)
 const geometry = new THREE.BufferGeometry();
 geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-geometry.setIndex(vertices);
+// geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+geometry.setIndex(indices);
 geometry.computeVertexNormals();
 
+const material = new THREE.MeshPhongMaterial({
+  color: '#8AC',
+  side: THREE.DoubleSide // prevents dark “missing” faces until normals are perfect
+});
 
 //const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 // .MeshPhongMaterial({color: '#8AC'})
 // .MeshBasicMaterial( { color: 0x00ff00 } )
-const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+// .MeshLambertMaterial
+// const material = new THREE.MeshPhongMaterial( { color: '#8AC' } );
 const mesh = new THREE.Mesh( geometry, material ) ;
 scene.add( mesh );
 
@@ -215,7 +239,7 @@ scene.add( mesh );
 const color = 0xFFFFFF;
 const intensity = 3;
 const light = new THREE.DirectionalLight(color, intensity);
-light.position.set(20, 50, 150);
+light.position.set(0, 50, 200);
 light.target.position.set(0, 50, 0);
 scene.add(light);
 scene.add(light.target);
