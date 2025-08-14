@@ -33,7 +33,7 @@ controls.dampingFactor = 0.05;
 // CatmullRomCurve3
 // SplineCurve
  const curve = new THREE.CatmullRomCurve3( [
-  new THREE.Vector3( 52, 5, 0 ), // almost actual start line 
+  new THREE.Vector3( 0, 5, 0 ), // almost actual start line 
   new THREE.Vector3( -76, 5, 0 ), // turn 1 start
   new THREE.Vector3( -78.5, 5.5, 0),
   // new THREE.Vector3( -78.5, 5.5, 0),
@@ -62,26 +62,26 @@ controls.dampingFactor = 0.05;
   new THREE.Vector3( -44, 85, -4.5),
   new THREE.Vector3( -45, 97.5, -4.25),
   new THREE.Vector3( -45, 100, -4), // turn 4 start
-  new THREE.Vector3( -44.5, 107.5, -3.8),
-  new THREE.Vector3( -46, 110, -3.6),
-  new THREE.Vector3( -50, 114, -3.4), // turn 4 end
-  new THREE.Vector3( -60, 122, -3.2), // turn 5 start
-  new THREE.Vector3( -67, 130, -3),
-  new THREE.Vector3( -67.5, 133, -2.8),
-  new THREE.Vector3( -67, 136, -2.6), 
-  new THREE.Vector3( -63.5, 139, -2.4), 
-  new THREE.Vector3( -60, 140, -2.2), // turn 5 end
-  new THREE.Vector3( -11, 136.5, -2), // turn 6 start
-  new THREE.Vector3( -10, 136, -1.8), 
-  new THREE.Vector3( -10, 135, -1.6), // turn 6 end
-  new THREE.Vector3( -10, 129, -1.6), // turn 7 start
-  new THREE.Vector3( -9.5, 127.5, -1.4),
-  new THREE.Vector3( -8, 126, -1.2),// turn 7 end
-  new THREE.Vector3( 6, 116, -1), // turn 8 start
-  new THREE.Vector3( 10, 115, -0.8),
-  new THREE.Vector3( 14, 116, -0.6), // turn 8 end
-  new THREE.Vector3( 22, 122, -0.4), // turn 9 start
-  new THREE.Vector3( 25, 122.5, -0.2),
+  new THREE.Vector3( -44.5, 107.5, -3.6),
+  new THREE.Vector3( -46, 110, -3.2),
+  new THREE.Vector3( -50, 114, -2.8), // turn 4 end
+  new THREE.Vector3( -60, 122, -2.4), // turn 5 start
+  new THREE.Vector3( -67, 130, -2),
+  new THREE.Vector3( -67.5, 133, -1.6),
+  new THREE.Vector3( -67, 136, -1.2), 
+  new THREE.Vector3( -63.5, 139, -0.8), 
+  new THREE.Vector3( -60, 140, -0.4), // turn 5 end
+  new THREE.Vector3( -11, 136.5, 0), // turn 6 start
+  new THREE.Vector3( -10, 136, 0), 
+  new THREE.Vector3( -10, 135, 0), // turn 6 end
+  new THREE.Vector3( -10, 129, 0), // turn 7 start
+  new THREE.Vector3( -9.5, 127.5, 0),
+  new THREE.Vector3( -8, 126, 0),// turn 7 end
+  new THREE.Vector3( 6, 116, 0), // turn 8 start
+  new THREE.Vector3( 10, 115, 0),
+  new THREE.Vector3( 14, 116, 0), // turn 8 end
+  new THREE.Vector3( 22, 122, 0), // turn 9 start
+  new THREE.Vector3( 25, 122.5, 0),
   new THREE.Vector3( 28, 120, 0), // turn 9 end
   new THREE.Vector3( 36, 110, 0), // turn 10 start
   new THREE.Vector3( 41, 103, 0), 
@@ -111,6 +111,7 @@ controls.dampingFactor = 0.05;
   new THREE.Vector3( 52, 5, 0), // turn 14 end
   new THREE.Vector3( 51.5, 5, 0),
   new THREE.Vector3( 51, 5, 0),
+  new THREE.Vector3( 0, 5, 0)
  ] )
 
 const points = curve.getPoints( 100 );
@@ -211,7 +212,7 @@ for (let i = 0; i < pathPoints.length; i++) {
     if (i === 0) {
         tangent = pathPoints[i + 1].clone().sub(point).normalize();
     } else if (i === pathPoints.length - 1) {
-        tangent = point.clone().sub(pathPoints[i - 1]).normalize();
+        tangent = pathPoints[0].clone().sub(pathPoints[1]).normalize(); // point.clone().sub(pathPoints[i - 1]).normalize();
     } else {
         tangent = pathPoints[i + 1].clone().sub(pathPoints[i - 1]).normalize();
     }
