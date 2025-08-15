@@ -111,7 +111,9 @@ controls.dampingFactor = 0.05;
   new THREE.Vector3( 52, 5, 0), // turn 14 end
   new THREE.Vector3( 51.5, 5, 0),
   new THREE.Vector3( 51, 5, 0),
-  new THREE.Vector3( 0, 5, 0)
+  new THREE.Vector3( 30, 5, 0),
+  new THREE.Vector3( 15, 5, 0),
+  new THREE.Vector3( -2, 5, 0)
  ] )
 
 const points = curve.getPoints( 100 );
@@ -210,19 +212,28 @@ for (let i = 0; i < pathPoints.length; i++) {
     // Compute tangent directly from neighboring points
     let tangent;
     if (i === 0) {
-        tangent = pathPoints[i + 1].clone().sub(point).normalize();
+        tangent = pathPoints[i + 1].clone().sub(point).normalize(); // pathPoints[i + 1].clone().sub(point).normalize();
     } else if (i === pathPoints.length - 1) {
-        tangent = pathPoints[0].clone().sub(pathPoints[1]).normalize(); // point.clone().sub(pathPoints[i - 1]).normalize();
+        tangent = pathPoints[1].clone().sub(pathPoints[0]).normalize(); // point.clone().sub(pathPoints[i - 1]).normalize();
     } else {
         tangent = pathPoints[i + 1].clone().sub(pathPoints[i - 1]).normalize();
     }
 
     // Parallel transport frame
-    if (i > 0) {
-        const projection = prevNormal.clone().projectOnVector(tangent);
-        prevNormal.sub(projection).normalize();
+    //if (i > 0) {
+    //    const projection = prevNormal.clone().projectOnVector(tangent);
+    //    prevNormal.sub(projection).normalize();
+    //} else {
+    //    prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
+    //}
+
+    if (i === 0) {
+      prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
+    } else if ( i > pathPoints.length - 2) {
+      prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
     } else {
-        prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
+      const projection = prevNormal.clone().projectOnVector(tangent);
+      prevNormal.sub(projection).normalize();
     }
 
     const binormal = new THREE.Vector3().crossVectors(tangent, prevNormal).normalize();
@@ -238,7 +249,32 @@ for (let i = 0; i < pathPoints.length; i++) {
   }
 
   // create indices for faces
-  if (i > 0) {
+//  if (i > 0) {
+//    const base = i * shape.length;
+//    const prevBase = (i - 1) * shape.length;
+//    for (let p = 0; p < shape.length; p++) {
+//      const nextP = (p + 1) % shape.length;
+//      indices.push(prevBase + p, base + p, base + nextP);
+//      indices.push(prevBase + p, base + nextP, prevBase + nextP);
+//    }
+//  }
+  if (i = 0) {
+    const base = (pathPoints.length - 1) * shape.length;
+    const prevBase = (pathPoints.length - 2) * shape.length;
+    for (let p = 0; p < shape.length; p++) {
+      const nextP = (p + 1) % shape/length;
+      indices.push(prevBase + p, base + p, base + nextP);
+      indices.push(prevBase + p, base + nextP, prevBase + nextP);
+    }
+  } else if (i = pathPoints.length - 1) {
+    const base = (pathPoints.length - 1) * shape.length;
+    const prevBase = (pathPoints.length - 2) * shape.length;
+    for (let p = 0; p < shape.length; p++) {
+      const nextP = (p + 1) % shape/length;
+      indices.push(prevBase + p, base + p, base + nextP);
+      indices.push(prevBase + p, base + nextP, prevBase + nextP);
+    }
+  } else {
     const base = i * shape.length;
     const prevBase = (i - 1) * shape.length;
     for (let p = 0; p < shape.length; p++) {
@@ -247,6 +283,8 @@ for (let i = 0; i < pathPoints.length; i++) {
       indices.push(prevBase + p, base + nextP, prevBase + nextP);
     }
   }
+
+
 }
 
 // assign vertices to geometry (needs indices, uvs, etc. for full mesh)
