@@ -111,9 +111,9 @@ controls.dampingFactor = 0.05;
   new THREE.Vector3( 52, 5, 0), // turn 14 end
   new THREE.Vector3( 51.5, 5, 0),
   new THREE.Vector3( 51, 5, 0),
-  new THREE.Vector3( 30, 5, 0),
-  new THREE.Vector3( 15, 5, 0),
-  new THREE.Vector3( -2, 5, 0)
+  // new THREE.Vector3( 30, 5, 0),
+  // new THREE.Vector3( 25, 5, 0),
+  new THREE.Vector3( 0, 5, 0)
  ] )
 
 const points = curve.getPoints( 100 );
@@ -167,7 +167,7 @@ const shape = [
 
 const up = new THREE.Vector3(0, 0, 1); // fixed up direction
 
-function getAdaptivePoints(curve, baseDivisions = 500, maxExtra = 8) {
+function getAdaptivePoints(curve, baseDivisions = 750, maxExtra = 8) {
   const points = [];
   
   let prevTangent = null;
@@ -198,6 +198,9 @@ function getAdaptivePoints(curve, baseDivisions = 500, maxExtra = 8) {
   return points;
 }
 
+let firstRing = [];
+let firstNormal = null;
+let firstBinormal = null;
 
 const positions = [];
 const indices = [];
@@ -212,9 +215,9 @@ for (let i = 0; i < pathPoints.length; i++) {
     // Compute tangent directly from neighboring points
     let tangent;
     if (i === 0) {
-        tangent = pathPoints[i + 1].clone().sub(point).normalize(); // pathPoints[i + 1].clone().sub(point).normalize();
+        tangent = pathPoints[i + 1].clone().sub(point).normalize() // pathPoints[i + 1].clone().sub(point).normalize(); 
     } else if (i === pathPoints.length - 1) {
-        tangent = pathPoints[1].clone().sub(pathPoints[0]).normalize(); // point.clone().sub(pathPoints[i - 1]).normalize();
+        tangent = point.clone().sub(pathPoints[i - 1]).normalize(); // pathPoints[1].clone().sub(pathPoints[0]).normalize();
     } else {
         tangent = pathPoints[i + 1].clone().sub(pathPoints[i - 1]).normalize();
     }
@@ -229,7 +232,8 @@ for (let i = 0; i < pathPoints.length; i++) {
 
     if (i === 0) {
       prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
-    } else if ( i > pathPoints.length - 2) {
+
+    } else if ( i > pathPoints.length - 1) {
       prevNormal = new THREE.Vector3().crossVectors(up, tangent).normalize();
     } else {
       const projection = prevNormal.clone().projectOnVector(tangent);
@@ -239,42 +243,44 @@ for (let i = 0; i < pathPoints.length; i++) {
     const binormal = new THREE.Vector3().crossVectors(tangent, prevNormal).normalize();
 
   // push shape vertices transformed into 3D space
-  for (let p = 0; p < shape.length; p++) {
-    const sp = shape[p];
-    const vertex = new THREE.Vector3()
-      .addScaledVector(prevNormal, sp.x)
-      .addScaledVector(binormal, sp.y)
-      .add(point);
-    positions.push(vertex.x, vertex.y, vertex.z);
+  // for (let p = 0; p < shape.length; p++) {
+  //   const sp = shape[p];
+  //   const vertex = new THREE.Vector3()
+  //     .addScaledVector(prevNormal, sp.x)
+  //     .addScaledVector(binormal, sp.y)
+  //     .add(point);
+  //   positions.push(vertex.x, vertex.y, vertex.z);
+  // }
+
+  // --- Handle last ring fix ---
+  let ringVertices = [];
+  if (i === pathPoints.length - 1) {
+    // Force last ring = first ring
+    ringVertices = firstRing.map(v => v.clone());
+  } else {
+    // Build normal ring
+    for (let p = 0; p < shape.length; p++) {
+      const sp = shape[p];
+      const vertex = new THREE.Vector3()
+        .addScaledVector(prevNormal, sp.x)
+        .addScaledVector(binormal, sp.y)
+        .add(point);
+      ringVertices.push(vertex);
+    }
+  }
+
+  // Push vertices to buffer
+  ringVertices.forEach(v => positions.push(v.x, v.y, v.z));
+
+  // Save first ring for reuse
+  if (i === 0) {
+    firstRing = ringVertices.map(v => v.clone());
+    firstNormal = prevNormal.clone();
+    firstBinormal = binormal.clone();
   }
 
   // create indices for faces
-//  if (i > 0) {
-//    const base = i * shape.length;
-//    const prevBase = (i - 1) * shape.length;
-//    for (let p = 0; p < shape.length; p++) {
-//      const nextP = (p + 1) % shape.length;
-//      indices.push(prevBase + p, base + p, base + nextP);
-//      indices.push(prevBase + p, base + nextP, prevBase + nextP);
-//    }
-//  }
-  if (i = 0) {
-    const base = (pathPoints.length - 1) * shape.length;
-    const prevBase = (pathPoints.length - 2) * shape.length;
-    for (let p = 0; p < shape.length; p++) {
-      const nextP = (p + 1) % shape/length;
-      indices.push(prevBase + p, base + p, base + nextP);
-      indices.push(prevBase + p, base + nextP, prevBase + nextP);
-    }
-  } else if (i = pathPoints.length - 1) {
-    const base = (pathPoints.length - 1) * shape.length;
-    const prevBase = (pathPoints.length - 2) * shape.length;
-    for (let p = 0; p < shape.length; p++) {
-      const nextP = (p + 1) % shape/length;
-      indices.push(prevBase + p, base + p, base + nextP);
-      indices.push(prevBase + p, base + nextP, prevBase + nextP);
-    }
-  } else {
+  if (i > 0) {
     const base = i * shape.length;
     const prevBase = (i - 1) * shape.length;
     for (let p = 0; p < shape.length; p++) {
@@ -283,8 +289,6 @@ for (let i = 0; i < pathPoints.length; i++) {
       indices.push(prevBase + p, base + nextP, prevBase + nextP);
     }
   }
-
-
 }
 
 // assign vertices to geometry (needs indices, uvs, etc. for full mesh)
@@ -294,9 +298,12 @@ geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)
 geometry.setIndex(indices);
 geometry.computeVertexNormals();
 
-const material = new THREE.MeshPhongMaterial({
+const material = new THREE.MeshToonMaterial({
   color: '#8AC',
-  side: THREE.DoubleSide // prevents dark “missing” faces until normals are perfect
+  side: THREE.DoubleSide, // prevents dark “missing” faces until normals are perfect
+  emissive: '#8AC',
+  emissiveMap: emissiveTexture,
+  emissiveIntensity: 1
 });
 
 //const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
