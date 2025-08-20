@@ -302,9 +302,18 @@ const material = new THREE.MeshToonMaterial({
   color: '#8AC',
   side: THREE.DoubleSide, // prevents dark “missing” faces until normals are perfect
   emissive: '#8AC',
-  emissiveMap: emissiveTexture,
+  // emissiveMap: emissiveTexture, // need to make a map
   emissiveIntensity: 1
 });
+
+// add a background to give some depth and so that the track glows onto it
+const geometryPlane = new THREE.PlaneGeometry( 800, 500 );
+const materialPlane = new THREE.MeshBasicMaterial( {color: "rgba(69, 68, 68, 1)", side: THREE.DoubleSide} );
+const plane = new THREE.Mesh( geometryPlane, materialPlane );
+plane.translateX(0);
+plane.translateY(50);
+plane.translateZ(-15);
+scene.add( plane );
 
 //const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 // .MeshPhongMaterial({color: '#8AC'})
