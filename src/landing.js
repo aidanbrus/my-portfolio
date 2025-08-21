@@ -2,7 +2,7 @@
 
 // console.log("Landing.js loaded");
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -224,9 +224,9 @@ function createTrack() {
   geometry.computeVertexNormals();
 
   const material = new THREE.MeshToonMaterial({
-    color: '#8AC',
+    color: 'rgba(65, 129, 193, 1)',
     side: THREE.DoubleSide, // prevents dark “missing” faces until normals are perfect
-    emissive: '#8AC',
+    emissive: 'rgba(24, 111, 199, 1)',
     // emissiveMap: emissiveTexture, // need to make a map
     // metalness: 0.8,
     // roughness: 0.2,
@@ -243,20 +243,33 @@ function createTrack() {
   return track;
 }
 
-function createPlane() {
+function createReflector() {
   const reflectorGeo = new THREE.PlaneGeometry(800, 500);
   const reflector = new Reflector(reflectorGeo, {
     clipBias: 0.003,
     textureWidth: window.innerWidth * window.devicePixelRatio,
     textureHeight: window.innerHeight * window.devicePixelRatio,
-    color: 'rgba(131, 129, 129, 1)'
+    color: 'rgba(78, 77, 81, 1)',
   });
-  // reflector.rotation.x = -Math.PI / 2;
+  reflector.material.transparent = true;
+  reflector.material.opacity = 0.99;
   reflector.translateX(0);
   reflector.translateY(50);
   reflector.translateZ(-15);
   scene.add(reflector);
   return reflector;
+}
+
+function createPlane() {
+  const geometryPlane = new THREE.PlaneGeometry( 800, 500 );
+  const materialPlane = new THREE.MeshBasicMaterial( {color: "rgba(40, 40, 44, 1)", side: THREE.DoubleSide} );
+  const botPlane = new THREE.Mesh( geometryPlane, materialPlane );
+  botPlane.translateX(0);
+  botPlane.translateY(50);
+  botPlane.translateZ(-20);
+  botPlane.receiveShadow = true;
+  scene.add(botPlane);
+  return botPlane;
 }
 
 init();
@@ -280,6 +293,9 @@ function init() {
   // controls
   const controls = new OrbitControls(camera, renderer.domElement);
 
+  // scene
+  scene.background = new THREE.Color(0x0a0a1a);
+
   // lighting
   const light = new THREE.DirectionalLight(0xFFFFFF, 3);
   light.position.set(50, 50, 200);
@@ -287,19 +303,25 @@ function init() {
   scene.add(light);
   scene.add(light.target);
 
+  const ambient = new THREE.AmbientLight(0x222244, 0.3);
+  scene.add(ambient);
+
   // track
   const track = createTrack();
 
-  // plane
-  const plane = createPlane();
+  // top plane
+  const reflectionPlane = createReflector();
+
+  // bottom plane
+  const bottomPlane = createPlane();
 
   // postprocessing w/ bloom
   const renderScene = new RenderPass(scene, camera);
   const bloomPass = new UnrealBloomPass(
     new THREE.Vector2( window.innerWidth, window.innerHeight),
-    1.5, // strength
-    0.4, // radius
-    0.85 // threshold
+    1.0, // strength
+    1.25, // radius
+    0.05 // threshold
   );
 
   composer = new EffectComposer(renderer);
