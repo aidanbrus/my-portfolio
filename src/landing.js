@@ -3,13 +3,16 @@
 // console.log("Landing.js loaded");
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
+// import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+// import { materialReflectivity, materialSpecularIntensity } from 'three/tsl';
 
 
 let scene, camera, renderer, composer;
+let cubeCamera;
+let frameCount = 0; // global comunter
 
 function createTrack() {
   // trace of the track
@@ -243,21 +246,45 @@ function createTrack() {
   return track;
 }
 
-function createReflector() {
-  const reflectorGeo = new THREE.PlaneGeometry(800, 500);
-  const reflector = new Reflector(reflectorGeo, {
-    clipBias: 0.003,
-    textureWidth: window.innerWidth * window.devicePixelRatio,
-    textureHeight: window.innerHeight * window.devicePixelRatio,
-    color: 'rgba(78, 77, 81, 1)',
-  });
-  reflector.material.transparent = true;
-  reflector.material.opacity = 0.99;
-  reflector.translateX(0);
-  reflector.translateY(50);
-  reflector.translateZ(-15);
-  scene.add(reflector);
-  return reflector;
+// function createReflector() {
+//   const reflectorGeo = new THREE.PlaneGeometry(800, 500);
+//   const reflector = new Reflector(reflectorGeo, {
+//     clipBias: 0.003,
+//     textureWidth: window.innerWidth * window.devicePixelRatio,
+//     textureHeight: window.innerHeight * window.devicePixelRatio,
+//     color: 'rgba(78, 77, 81, 1)',
+//   });
+//   reflector.material.transparent = true;
+//   reflector.material.opacity = 0.99;
+//   reflector.translateX(0);
+//   reflector.translateY(50);
+//   reflector.translateZ(-15);
+//   scene.add(reflector);
+//   return reflector;
+// }
+
+function createMirror(envMap) {
+  const mirrorGeo = new THREE.PlaneGeometry(800, 500);
+  const mirrorMat = new THREE.MeshPhysicalMaterial({});
+  mirrorMat.reflectivity = 0.75;
+  mirrorMat.transmission = 0.9;
+  mirrorMat.ior = 2.1;
+  mirrorMat.roughness = 0.19;
+  mirrorMat.sheen = 0.44;
+  mirrorMat.sheenRoughness = 0.54;
+  mirrorMat.thickness = 0.5;
+  mirrorMat.clearcoat = 0.85;
+  mirrorMat.clearcoatRoughness = 0.25;
+  mirrorMat.color = new THREE.Color(0xffffff);
+  mirrorMat.metalness = 0;
+  mirrorMat.envMap = envMap;
+  
+  const mirror = new THREE.Mesh(mirrorGeo, mirrorMat);
+  mirror.position.x = 0;
+  mirror.position.y = 50;
+  mirror.position.z = -15;
+  scene.add(mirror);
+  return mirror;
 }
 
 function createPlane() {
@@ -306,11 +333,20 @@ function init() {
   const ambient = new THREE.AmbientLight(0x222244, 0.3);
   scene.add(ambient);
 
+  // environment map & CubeCamera
+  const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
+    format: THREE.RGBAFormat,
+    generateMipmaps: true,
+    minFilter: THREE.LinearMipmapLinearFilter
+  });
+  const cubeCamera = new THREE.CubeCamera( 0.1, 1000, cubeRenderTarget);
+  scene.add(cubeCamera);
+
   // track
   const track = createTrack();
 
   // top plane
-  const reflectionPlane = createReflector();
+  const mirrorPlane = createMirror(cubeRenderTarget.texture);
 
   // bottom plane
   const bottomPlane = createPlane();
@@ -340,6 +376,13 @@ function onWindowResize() {
 
 function animate() {
   requestAnimationFrame(animate);
+
+  // update cubeCamera only sometimes
+  frameCount++;
+  if (frameCount % 30 === 0) {  // update every ~30 frames
+    cubeCamera.update(renderer, scene);
+  }
+
   composer.render();
 }
 
