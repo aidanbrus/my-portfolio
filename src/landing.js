@@ -3,11 +3,11 @@
 // console.log("Landing.js loaded");
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-// import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
+import { Reflector } from 'three/examples/jsm/objects/Reflector.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-// import { materialReflectivity, materialSpecularIntensity } from 'three/tsl';
+import { emissive, materialReflectivity, materialSpecularIntensity } from 'three/tsl';
 
 
 let scene, camera, renderer, composer;
@@ -234,7 +234,7 @@ function createTrack() {
     // emissiveMap: emissiveTexture, // need to make a map
     // metalness: 0.8,
     // roughness: 0.2,
-    emissiveIntensity: 5.0
+    emissiveIntensity: 2.0
   });
 
   //const geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
@@ -247,67 +247,107 @@ function createTrack() {
   return track;
 }
 
-// function createReflector() {
-//   const reflectorGeo = new THREE.PlaneGeometry(800, 500);
-//   const reflector = new Reflector(reflectorGeo, {
-//     clipBias: 0.003,
-//     textureWidth: window.innerWidth * window.devicePixelRatio,
-//     textureHeight: window.innerHeight * window.devicePixelRatio,
-//     color: 'rgba(78, 77, 81, 1)',
-//   });
-//   reflector.material.transparent = true;
-//   reflector.material.opacity = 0.99;
-//   reflector.translateX(0);
-//   reflector.translateY(50);
-//   reflector.translateZ(-15);
-//   scene.add(reflector);
-//   return reflector;
-// }
+function createReflector() {
+  const reflectorGeo = new THREE.PlaneGeometry(800, 500);
+  const reflector = new Reflector(reflectorGeo, {
+    clipBias: 0.003,
+    textureWidth: window.innerWidth * window.devicePixelRatio,
+    textureHeight: window.innerHeight * window.devicePixelRatio,
+    color: 'rgba(78, 77, 81, 1)',
+  });
 
-function createMirror(envMap) {
-  const mirrorGeo = new THREE.PlaneGeometry(800, 500);
-  const mirrorMat = new THREE.MeshPhysicalMaterial({});
-  mirrorMat.transparent = true;
-  // mirrorMat.reflectivity = 0.5;
-  mirrorMat.transmission = 0.25;
-  // mirrorMat.ior = 1.5;
-  mirrorMat.roughness = 0.0;
-  // mirrorMat.sheen = 0.95;
-  // mirrorMat.sheenRoughness = 0.54;
-  mirrorMat.thickness = 1.0;
-  mirrorMat.clearcoat = 0.5;
-  mirrorMat.clearcoatRoughness = 0.2;
-  // mirrorMat.color = new THREE.Color("rgba(69, 65, 65, 1)");
-  mirrorMat.metalness = 1.0;
-  mirrorMat.envMap = envMap;
-  mirrorMat.envMapIntensity = 0.5;
-  // mirrorMat.opacity = 1.0;
+  reflector.material.transparent = true;
+  reflector.material.opacity = 0.2;
+  reflector.material.needsUpdate = true;
 
-  // mirrorMat.envMap.repeat.set(5, 5);
-  // mirrorMat.needsUpdate = true;
-  
-  const mirror = new THREE.Mesh(mirrorGeo, mirrorMat);
-  mirror.position.x = 0;
-  mirror.position.y = 50;
-  mirror.position.z = -10;
-  //scene.add(mirror);
-  return mirror;
+  reflector.translateX(0);
+  reflector.translateY(50);
+  reflector.translateZ(-10);
+  // scene.add(reflector);
+  return reflector;
 }
 
+// function createMirror(envMap) {
+//   const mirrorGeo = new THREE.PlaneGeometry(800, 500);
+//   const mirrorMat = new THREE.MeshPhysicalMaterial({});
+//   mirrorMat.transparent = true;
+//   // mirrorMat.reflectivity = 0.5;
+//   mirrorMat.transmission = 0.25;
+//   // mirrorMat.ior = 1.5;
+//   mirrorMat.roughness = 0.0;
+//   // mirrorMat.sheen = 0.95;
+//   // mirrorMat.sheenRoughness = 0.54;
+//   mirrorMat.thickness = 1.0;
+//   mirrorMat.clearcoat = 0.5;
+//   mirrorMat.clearcoatRoughness = 0.2;
+//   // mirrorMat.color = new THREE.Color("rgba(69, 65, 65, 1)");
+//   mirrorMat.metalness = 1.0;
+//   mirrorMat.envMap = envMap;
+//   mirrorMat.envMapIntensity = 0.5;
+//   // mirrorMat.opacity = 1.0;
+
+//   // mirrorMat.envMap.repeat.set(5, 5);
+//   // mirrorMat.needsUpdate = true;
+  
+//   const mirror = new THREE.Mesh(mirrorGeo, mirrorMat);
+//   mirror.position.x = 0;
+//   mirror.position.y = 50;
+//   mirror.position.z = -10;
+//   //scene.add(mirror);
+//   return mirror;
+// }
+
 function createPlane() {
+  // create a canvas for lines
+   const size = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // background color
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, size, size);
+
+  // Draw grid lines
+  ctx.strokeStyle = '#00ffff';
+  ctx.lineWidth = 2; // thickness in pixels
+  const divisions = 2;
+  const spacing = canvas.width / divisions;
+  for (let i = 0; i <= divisions; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * spacing, 0);
+    ctx.lineTo(i * spacing, canvas.height);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(0, i * spacing);
+    ctx.lineTo(canvas.width, i * spacing);
+    ctx.stroke();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(10,10);
+
   const geometryPlane = new THREE.PlaneGeometry( 800, 500 );
-  const materialPlane = new THREE.MeshBasicMaterial( {color: "rgba(58, 58, 60, 1)", side: THREE.DoubleSide} );
+  const materialPlane = new THREE.MeshBasicMaterial( {
+    map: texture,
+    emissiveMap: texture,
+    emissive : "rgba(52, 156, 208, 1)",
+    emissiveIntensity: 0.4,
+    side: THREE.DoubleSide
+  } );
   const botPlane = new THREE.Mesh( geometryPlane, materialPlane );
   botPlane.translateX(0);
   botPlane.translateY(50);
-  botPlane.translateZ(-100);
+  botPlane.translateZ(-20);
   botPlane.receiveShadow = true;
   //scene.add(botPlane);
   return botPlane;
 }
 
-// init();
-// animate();
+init();
+animate();
 
 function init() {
   // fog
@@ -345,22 +385,19 @@ function init() {
   scene.add(track);
 
   // environment map & CubeCamera
-  const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(1024, {
-    format: THREE.RGBAFormat,
-    generateMipmaps: true,
-    minFilter: THREE.LinearMipmapLinearFilter
-  });
-  cubeCamera = new THREE.CubeCamera( 30, 100, cubeRenderTarget);
-  cubeCamera.position.x = 0;
-  cubeCamera.position.y = 65;
-  cubeCamera.position.z = -9.99999999999999;
-  scene.add(cubeCamera);
-
-  // // track
-  // const track = createTrack();
+  // const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(1024, {
+  //   format: THREE.RGBAFormat,
+  //   generateMipmaps: true,
+  //   minFilter: THREE.LinearMipmapLinearFilter
+  // });
+  // cubeCamera = new THREE.CubeCamera( 30, 100, cubeRenderTarget);
+  // cubeCamera.position.x = 0;
+  // cubeCamera.position.y = 65;
+  // cubeCamera.position.z = -9.99999999999999;
+  // scene.add(cubeCamera);
 
   // top plane
-  mirror = createMirror(cubeRenderTarget.texture);
+  mirror = createReflector();
   scene.add(mirror);
 
   // bottom plane
@@ -394,16 +431,13 @@ function animate() {
   requestAnimationFrame(animate);
 
   // update cubeCamera only sometimes
-  frameCount++;
-  if (frameCount % 30 === 0) {  // update every ~30 frames
-    mirror.visible = false;
-    cubeCamera.update(renderer, scene);
-    mirror.visible = true;
-  }
+  // frameCount++;
+  // if (frameCount % 30 === 0) {  // update every ~30 frames
+  //   mirror.visible = false;
+  //   cubeCamera.update(renderer, scene);
+  //   mirror.visible = true;
+  // }
 
   composer.render();
 }
-
-init();
-animate();
 
