@@ -8,6 +8,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { emissive, materialReflectivity, materialSpecularIntensity } from 'three/tsl';
+import {newReflector} from './newReflector.js';
 
 
 let scene, camera, renderer, composer;
@@ -248,8 +249,8 @@ function createTrack() {
 }
 
 function createReflector() {
-  const reflectorGeo = new THREE.PlaneGeometry(800, 500);
-  const reflector = new Reflector(reflectorGeo, {
+  const reflectorGeo = new THREE.PlaneGeometry(1600, 1000);
+  const reflector = new newReflector(reflectorGeo, {
     clipBias: 0.003,
     textureWidth: window.innerWidth * window.devicePixelRatio,
     textureHeight: window.innerHeight * window.devicePixelRatio,
@@ -257,45 +258,15 @@ function createReflector() {
   });
 
   reflector.material.transparent = true;
-  reflector.material.opacity = 0.2;
+  // reflector.material.opacity = 0.875;
   reflector.material.needsUpdate = true;
 
-  reflector.translateX(0);
-  reflector.translateY(50);
+  reflector.translateX(20);
+  reflector.translateY(25);
   reflector.translateZ(-10);
   // scene.add(reflector);
   return reflector;
 }
-
-// function createMirror(envMap) {
-//   const mirrorGeo = new THREE.PlaneGeometry(800, 500);
-//   const mirrorMat = new THREE.MeshPhysicalMaterial({});
-//   mirrorMat.transparent = true;
-//   // mirrorMat.reflectivity = 0.5;
-//   mirrorMat.transmission = 0.25;
-//   // mirrorMat.ior = 1.5;
-//   mirrorMat.roughness = 0.0;
-//   // mirrorMat.sheen = 0.95;
-//   // mirrorMat.sheenRoughness = 0.54;
-//   mirrorMat.thickness = 1.0;
-//   mirrorMat.clearcoat = 0.5;
-//   mirrorMat.clearcoatRoughness = 0.2;
-//   // mirrorMat.color = new THREE.Color("rgba(69, 65, 65, 1)");
-//   mirrorMat.metalness = 1.0;
-//   mirrorMat.envMap = envMap;
-//   mirrorMat.envMapIntensity = 0.5;
-//   // mirrorMat.opacity = 1.0;
-
-//   // mirrorMat.envMap.repeat.set(5, 5);
-//   // mirrorMat.needsUpdate = true;
-  
-//   const mirror = new THREE.Mesh(mirrorGeo, mirrorMat);
-//   mirror.position.x = 0;
-//   mirror.position.y = 50;
-//   mirror.position.z = -10;
-//   //scene.add(mirror);
-//   return mirror;
-// }
 
 function createPlane() {
   // create a canvas for lines
@@ -329,17 +300,17 @@ function createPlane() {
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   texture.repeat.set(10,10);
 
-  const geometryPlane = new THREE.PlaneGeometry( 800, 500 );
+  const geometryPlane = new THREE.PlaneGeometry( 1600, 1000 );
   const materialPlane = new THREE.MeshBasicMaterial( {
     map: texture,
     emissiveMap: texture,
     emissive : "rgba(52, 156, 208, 1)",
-    emissiveIntensity: 0.4,
+    emissiveIntensity: 2.0,
     side: THREE.DoubleSide
   } );
   const botPlane = new THREE.Mesh( geometryPlane, materialPlane );
-  botPlane.translateX(0);
-  botPlane.translateY(50);
+  botPlane.translateX(20);
+  botPlane.translateY(25);
   botPlane.translateZ(-20);
   botPlane.receiveShadow = true;
   //scene.add(botPlane);
@@ -384,18 +355,6 @@ function init() {
   track = createTrack();
   scene.add(track);
 
-  // environment map & CubeCamera
-  // const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(1024, {
-  //   format: THREE.RGBAFormat,
-  //   generateMipmaps: true,
-  //   minFilter: THREE.LinearMipmapLinearFilter
-  // });
-  // cubeCamera = new THREE.CubeCamera( 30, 100, cubeRenderTarget);
-  // cubeCamera.position.x = 0;
-  // cubeCamera.position.y = 65;
-  // cubeCamera.position.z = -9.99999999999999;
-  // scene.add(cubeCamera);
-
   // top plane
   mirror = createReflector();
   scene.add(mirror);
@@ -429,14 +388,6 @@ function onWindowResize() {
 
 function animate() {
   requestAnimationFrame(animate);
-
-  // update cubeCamera only sometimes
-  // frameCount++;
-  // if (frameCount % 30 === 0) {  // update every ~30 frames
-  //   mirror.visible = false;
-  //   cubeCamera.update(renderer, scene);
-  //   mirror.visible = true;
-  // }
 
   composer.render();
 }
