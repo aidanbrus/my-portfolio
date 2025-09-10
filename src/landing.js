@@ -13,6 +13,7 @@ import {newReflector} from './newReflector.js';
 
 let scene, camera, renderer, composer;
 let cubeCamera;
+let loadingScene, loadingCamera, tracer, manager, tracerPos;
 let mirror, track, botPlane;
 let frameCount = 0; // global comunter
 
@@ -317,13 +318,51 @@ function createPlane() {
   return botPlane;
 }
 
-init();
+init(); 
 animate();
 
 function init() {
+  initLoadingScene();
+  animationLoader();
+}
+
+function initLoadingScene() {
+  loadingScene = new THREE.Scene();
+  loadingCamera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+  // tracer for loading animation
+  tracer = new THREE.Mesh(
+    new THREE.SphereGeometry(4, 16, 8),
+    new THREE.MeshBasicMaterial({color:'rgba(157, 244, 255, 1)'})
+  );
+  loadingScene.add(tracer);
+
+  // loading manager
+  manager = new THREE.LoadingManager();
+  manager.onLoad = handleLoadComplete;
+}
+
+function animationLoader() {
+  requestAnimationFrame(animationLoader);
+
+  // Update tracer position
+  tracerPos = (tracerPos + 0.001) % 1;
+  tracer.position.copy(track.getPointAt(tracerPos));
+
+  renderer.render(loadingScene, loadingCamera);
+}
+
+function handleLoadComplete() {
+  setTimeout(() => {
+    initMainScene();
+    animate();
+  }, 5000); // min wait time in ms
+}
+
+function initMainScene() {
   // fog
   scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x000000, 0.002);
+  scene.fog = new THREE.FogExp2(0x000000, 0.004);
 
   // camera
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
