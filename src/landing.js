@@ -12,14 +12,17 @@ import {newReflector} from './newReflector.js';
 
 
 let scene, camera, renderer, composer;
-let cubeCamera;
-let loadingScene, loadingCamera, tracer, manager, tracerPos;
+let curve;
+let loadingScene, loadingCamera, lrenderer, tracer, manager, Loadtrack;
 let mirror, track, botPlane;
 let frameCount = 0; // global comunter
+let tracerT = 0;
+let speed = 1;
+let lastFrameTime = performance.now();
 
 function createTrack() {
   // trace of the track
-  const curve = new THREE.CatmullRomCurve3( [
+  curve = new THREE.CatmullRomCurve3( [
     new THREE.Vector3( 0, 5, 0 ), // almost actual start line 
     new THREE.Vector3( -76, 5, 0 ), // turn 1 start
     new THREE.Vector3( -78.5, 5.5, 0),
@@ -327,8 +330,22 @@ function init() {
 }
 
 function initLoadingScene() {
+  // scene
   loadingScene = new THREE.Scene();
   loadingCamera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+  // loading renderer
+  lrenderer = new THREE.WebGLRenderer({ antialias:true });
+  lrenderer.setSize(window.innerWidth, window.innerHeight);
+  lrenderer.setClearColor(0x000000, 1);
+  document.body.appendChild(lrenderer.domElement);
+
+  // low quality version of background
+  loadingScene.background = new THREE.Color(0x0a0a1a);
+
+  // track
+  Loadtrack = createTrack();
+  loadingScene.add(Loadtrack);
 
   // tracer for loading animation
   tracer = new THREE.Mesh(
@@ -339,24 +356,45 @@ function initLoadingScene() {
 
   // loading manager
   manager = new THREE.LoadingManager();
-  manager.onLoad = handleLoadComplete;
+  manager.onLoad = handleLoadComplete();
 }
+
+// let tracerT = 0;
+// let speed = 1;
+// let lastFrameTime = performance.now();
 
 function animationLoader() {
   requestAnimationFrame(animationLoader);
 
-  // Update tracer position
-  tracerPos = (tracerPos + 0.001) % 1;
-  tracer.position.copy(track.getPointAt(tracerPos));
+  // tracer animation
+  const now = performance.now();
+  const delta = (now - lastFrameTime) / 1000; // seconds
+  lastFrameTime = now;
 
-  renderer.render(loadingScene, loadingCamera);
+  tracerT = (tracerT + speed * delta) % 1;
+  tracer.position.copy(curve.getPointAt(tracerT));
+  tracer.position.y += 0.5;
+
+  lrenderer.render(loadingScene, loadingCamera);
 }
 
+let MinLoadTime = 4000; // min wait time in ms
+//let startTime = performance.now();
+
 function handleLoadComplete() {
-  setTimeout(() => {
+  const elapsed = performance.now(); // - startTime;
+  // const remaining = Math.max(0, MinLoadTime - elapsed);
+
+  if (elapsed > 4000 && tracerT < 0.05) {
+    // function to fade between the two scenes
     initMainScene();
     animate();
-  }, 5000); // min wait time in ms
+  };
+
+  // setTimeout(() => {
+  //   initMainScene();
+  //   animate();
+  // }, remaining); 
 }
 
 function initMainScene() {
