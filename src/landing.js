@@ -13,12 +13,13 @@ import {newReflector} from './newReflector.js';
 
 let scene, camera, renderer, composer;
 let curve;
-let loadingScene, loadingCamera, lrenderer, tracer, manager, Loadtrack;
+let loadingScene, loadingCamera, lrenderer, tracer, manager, Loadtrack, elapsed;
 let mirror, track, botPlane;
 let frameCount = 0; // global comunter
 let tracerT = 0;
-let speed = 1;
+let speed = 0.25;
 let lastFrameTime = performance.now();
+let loadStartTime = performance.now();
 
 function createTrack() {
   // trace of the track
@@ -322,7 +323,7 @@ function createPlane() {
 }
 
 init(); 
-animate();
+// animate();
 
 function init() {
   initLoadingScene();
@@ -333,6 +334,7 @@ function initLoadingScene() {
   // scene
   loadingScene = new THREE.Scene();
   loadingCamera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  loadingCamera.position.set( 0, 100, 200);
 
   // loading renderer
   lrenderer = new THREE.WebGLRenderer({ antialias:true });
@@ -378,17 +380,21 @@ function animationLoader() {
   lrenderer.render(loadingScene, loadingCamera);
 }
 
-let MinLoadTime = 4000; // min wait time in ms
-//let startTime = performance.now();
-
 function handleLoadComplete() {
-  const elapsed = performance.now(); // - startTime;
-  // const remaining = Math.max(0, MinLoadTime - elapsed);
+  const now = performance.now();
+  elapsed = now - loadStartTime;
+  console.log(elapsed);
 
   if (elapsed > 4000 && tracerT < 0.05) {
     // function to fade between the two scenes
     initMainScene();
     animate();
+  } else {
+    const remaining = 4000 - elapsed;
+    setTimeout(() => {
+      initMainScene();
+      animate();
+    }, remaining);
   };
 
   // setTimeout(() => {
@@ -468,4 +474,3 @@ function animate() {
 
   composer.render();
 }
-
