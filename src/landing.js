@@ -13,7 +13,7 @@ import {newReflector} from './newReflector.js';
 
 let scene, camera, renderer, composer;
 let curve;
-let loadingScene, loadingCamera, lrenderer, tracer, manager, Loadtrack, elapsed;
+let loadingScene, loadingCamera, loadAnimID, tracer, manager, Loadtrack, elapsed;
 let mirror, track, botPlane;
 let frameCount = 0; // global comunter
 let tracerT = 0;
@@ -334,13 +334,13 @@ function initLoadingScene() {
   // scene
   loadingScene = new THREE.Scene();
   loadingCamera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  loadingCamera.position.set( 0, 100, 200);
+  loadingCamera.position.set( 0, 72.5, 400);
 
   // loading renderer
-  lrenderer = new THREE.WebGLRenderer({ antialias:true });
-  lrenderer.setSize(window.innerWidth, window.innerHeight);
-  lrenderer.setClearColor(0x000000, 1);
-  document.body.appendChild(lrenderer.domElement);
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 1);
+  document.body.appendChild(renderer.domElement);
 
   // low quality version of background
   loadingScene.background = new THREE.Color(0x0a0a1a);
@@ -366,7 +366,7 @@ function initLoadingScene() {
 // let lastFrameTime = performance.now();
 
 function animationLoader() {
-  requestAnimationFrame(animationLoader);
+  loadAnimID = requestAnimationFrame(animationLoader);
 
   // tracer animation
   const now = performance.now();
@@ -377,7 +377,7 @@ function animationLoader() {
   tracer.position.copy(curve.getPointAt(tracerT));
   tracer.position.y += 0.5;
 
-  lrenderer.render(loadingScene, loadingCamera);
+  renderer.render(loadingScene, loadingCamera);
 }
 
 function handleLoadComplete() {
@@ -385,22 +385,18 @@ function handleLoadComplete() {
   elapsed = now - loadStartTime;
   console.log(elapsed);
 
-  if (elapsed > 4000 && tracerT < 0.05) {
-    // function to fade between the two scenes
+  if (elapsed > 4000 && tracerT < 0.01) {
+    cancelAnimationFrame(loadAnimID);
     initMainScene();
     animate();
   } else {
     const remaining = 4000 - elapsed;
     setTimeout(() => {
+      cancelAnimationFrame(loadAnimID);
       initMainScene();
       animate();
     }, remaining);
   };
-
-  // setTimeout(() => {
-  //   initMainScene();
-  //   animate();
-  // }, remaining); 
 }
 
 function initMainScene() {
@@ -410,16 +406,16 @@ function initMainScene() {
 
   // camera
   camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.set( 0, 200, 200);
+  camera.position.set( 0, 72.5, 400);
 
   // renderer
-  renderer = new THREE.WebGLRenderer({ antialias:true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x000000, 1);
-  document.body.appendChild(renderer.domElement);
+  // renderer = new THREE.WebGLRenderer({ antialias:true });
+  // renderer.setSize(window.innerWidth, window.innerHeight);
+  // renderer.setClearColor(0x000000, 1);
+  // document.body.appendChild(renderer.domElement);
 
   // controls
-  const controls = new OrbitControls(camera, renderer.domElement);
+  // const controls = new OrbitControls(camera, renderer.domElement);
 
   // scene
   scene.background = new THREE.Color(0x0a0a1a);
