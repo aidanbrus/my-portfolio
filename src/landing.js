@@ -11,15 +11,22 @@ import { emissive, materialReflectivity, materialSpecularIntensity } from 'three
 import {newReflector} from './newReflector.js';
 
 
-let scene, camera, renderer, composer;
+let scene, camera, renderer, composer, cameraPos;
 let curve;
-let loadingScene, loadingCamera, loadAnimID, tracer, manager, Loadtrack, elapsed;
+let loadingScene, loadAnimID, tracer, manager, Loadtrack, elapsed;
 let mirror, track, botPlane;
 let frameCount = 0; // global comunter
 let tracerT = 0;
 let speed = 0.25;
 let lastFrameTime = performance.now();
 let loadStartTime = performance.now();
+let deltaCam = 1.0;
+let camPhase = 0.0;
+let camProgress1 = 0.0;
+let camProgress2 = 0.0;
+let camProgress3 = 0.0;
+let camSpeed = 0.004;
+let phaseTwoClick = false;
 
 function createTrack() {
   // trace of the track
@@ -333,8 +340,10 @@ function init() {
 function initLoadingScene() {
   // scene
   loadingScene = new THREE.Scene();
-  loadingCamera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  loadingCamera.position.set( 0, 72.5, 400);
+  camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.set( 0, 72.5, 500);
+
+  // loadingScene.fog = new THREE.FogExp2(0x000000, 0.004);
 
   // loading renderer
   renderer = new THREE.WebGLRenderer({ antialias:true });
@@ -377,22 +386,24 @@ function animationLoader() {
   tracer.position.copy(curve.getPointAt(tracerT));
   tracer.position.y += 0.5;
 
-  renderer.render(loadingScene, loadingCamera);
+  renderer.render(loadingScene, camera);
 }
 
 function handleLoadComplete() {
   const now = performance.now();
   elapsed = now - loadStartTime;
-  console.log(elapsed);
+  //console.log(elapsed);
 
   if (elapsed > 4000 && tracerT < 0.01) {
     cancelAnimationFrame(loadAnimID);
+    camPhase = 1.0;
     initMainScene();
     animate();
   } else {
     const remaining = 4000 - elapsed;
     setTimeout(() => {
       cancelAnimationFrame(loadAnimID);
+      camPhase = 1.0;
       initMainScene();
       animate();
     }, remaining);
@@ -405,8 +416,8 @@ function initMainScene() {
   scene.fog = new THREE.FogExp2(0x000000, 0.004);
 
   // camera
-  camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
-  camera.position.set( 0, 72.5, 400);
+  // camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  // camera.position.set( 0, 72.5, 400);
 
   // renderer
   // renderer = new THREE.WebGLRenderer({ antialias:true });
@@ -465,8 +476,55 @@ function onWindowResize() {
   composer.setSize(window.innerWidth, window.innerHeight);
 }
 
+// on click for camera animation
+window.addEventListener('click', () => {
+  phaseTwoClick = true;
+});
+
+function updateCamera(){
+  if (camPhase == 1.0){
+    // transition from loading camera spot to initial main spot
+    setTimeout(() => {
+      camProgress1 += camSpeed;
+      if (camProgress1 > 1) {
+        camProgress1 = 1;
+        camPhase = 2.0; // move to next phase, or stay idle
+      }
+      let easing = easeIOCubic(camProgress1);
+
+      camera.position.z = THREE.MathUtils.lerp(500, 150, easing);
+    }, 250);
+
+  } else if (camPhase == 2.0 && phaseTwoClick) {
+    // transition from top down to on track
+    camProgress2 += camSpeed;
+      if (camProgress2 > 1) {
+        camProgress2 = 1;
+        camPhase = 2.0; // move to next phase, or stay idle
+      }
+      let easing = easeIOCubic(camProgress2);
+
+      // camera.position.x = THREE.MathUtils.lerp(500, 150, easing);
+      camera.position.y = THREE.MathUtils.lerp(72.5, 5, easing);
+      camera.position.z = THREE.MathUtils.lerp(150, 5, easing);
+
+
+  } else if (camPhase == 3.0) {
+    // once user is on track
+    // controlled by scroll
+  };
+};
+
+// function for easying camera movements
+function easeIOCubic(t) {
+  return t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
 function animate() {
   requestAnimationFrame(animate);
+  updateCamera();
 
   composer.render();
 }
