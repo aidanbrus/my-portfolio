@@ -15,6 +15,7 @@ let scene, camera, renderer, composer, cameraPos;
 let curve;
 let loadingScene, loadAnimID, tracer, manager, Loadtrack, elapsed;
 let mirror, track, botPlane;
+let camDist;
 let frameCount = 0; // global comunter
 let tracerT = 0;
 let speed = 0.25;
@@ -481,7 +482,16 @@ window.addEventListener('click', () => {
   phaseTwoClick = true;
 });
 
-function updateCamera(){
+// tracking scrolling for main animation
+const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+
+  // 3. Normalize (0 at top, 1 at bottom)
+  camDist = scrollY / scrollableHeight;
+});
+
+function updateCamera(camDist){
   if (camPhase == 1.0){
     // transition from loading camera spot to initial main spot
     setTimeout(() => {
@@ -500,18 +510,28 @@ function updateCamera(){
     camProgress2 += camSpeed;
       if (camProgress2 > 1) {
         camProgress2 = 1;
-        camPhase = 2.0; // move to next phase, or stay idle
+        camPhase = 3.0; // move to next phase, or stay idle
       }
       let easing = easeIOCubic(camProgress2);
 
       // camera.position.x = THREE.MathUtils.lerp(500, 150, easing);
       camera.position.y = THREE.MathUtils.lerp(72.5, 5, easing);
-      camera.position.z = THREE.MathUtils.lerp(150, 5, easing);
+      camera.position.z = THREE.MathUtils.lerp(150, 3, easing);
+      camera.rotation.y = THREE.MathUtils.lerp(0, Math.PI/2, easing);
+      camera.rotation.z = THREE.MathUtils.lerp(0, Math.PI/2, easing);
 
 
   } else if (camPhase == 3.0) {
     // once user is on track
-    // controlled by scroll
+    // const position = curve.getPointAt(camDist); // camera position along curve
+    const tangent = curve.getTangentAt(camDist); // direction of motion
+
+    camera.position.copy(curve.getPointAt(camDist));
+
+    // Option 1: make camera look forward along the track
+    const lookAtPoint = position.clone().add(tangent);
+    camera.lookAt(lookAtPoint);
+
   };
 };
 
